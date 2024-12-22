@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FaHome, FaList, FaUsers, FaShoppingCart, FaChalkboardTeacher, FaBook, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaList,FaExclamationCircle,FaUndoAlt , FaUsers, FaShoppingCart,FaFlag, FaChalkboardTeacher, FaBook, FaSignOutAlt } from 'react-icons/fa';
 import { setActiveItem, initializeFromPath, selectActiveItem } from '../../../Redux/Slices/sidebarSlice';
 import { logoutAdmin } from '../../../Redux/Slices/adminSlice';
 
@@ -22,9 +22,11 @@ const Sidebar = ({ isDarkMode,onLogout }) => {
     { name: 'Dashboard', icon: FaHome, path: '/admin/dashboard' },
     { name: 'Category', icon: FaList, path: '/admin/category' },
     { name: 'Students', icon: FaUsers, path: '/admin/students' },
-    { name: 'Orders', icon: FaShoppingCart, path: '/admin/orders' },
+    { name: 'Orders', icon: FaShoppingCart, path: '/admin/payments' },
     { name: 'Tutors', icon: FaChalkboardTeacher, path: '/admin/tutors' },
     { name: 'Courses', icon: FaBook, path: '/admin/courses' },
+    { name: 'Reported Courses', icon: FaFlag, path: '/admin/reportedcourses' }, 
+    { name: 'Refunds', icon: FaUndoAlt, path: '/admin/refund' }, 
     { name: 'Logout', icon: FaSignOutAlt, action: onLogout },
   ];
 

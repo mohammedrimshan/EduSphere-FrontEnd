@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import axiosInterceptor from "@/axiosInstance";
 import {
   BarChart,
   Bar,
@@ -11,30 +12,21 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  Star,
-  BookOpen,
-  DollarSign,
-  Users,
-  Plus,
-  Edit,
-  Eye,
-  Calendar,
-  Home,
-  Info,
-  Phone,
-} from "lucide-react";
+import { Star, BookOpen, DollarSign, Users, Plus, Edit, Eye, Calendar, Home, Info, Phone } from 'lucide-react';
 import {
   MdDashboard,
   MdOutlinePerson,
   MdLibraryBooks,
   MdAttachMoney,
+  MdReport,
+  MdSavings,
 } from "react-icons/md";
 import {
   FaComments,
   FaChalkboardTeacher,
   FaRegQuestionCircle,
 } from "react-icons/fa";
+import RevenueOverview from "./Common/RevenueOverview";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -49,29 +41,36 @@ import LogoutModal from "@/ui/LogOutModal";
 import { logoutTutor } from "../../Redux/Slices/tutorSlice";
 import { toast, Toaster } from "sonner";
 import Footer from "../USER/Common/Footer";
+
 const TutorHome = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const tutorData = useSelector((state) => state.tutor.tutorData);
-  console.log(
-    "Redux State:",
-    useSelector((state) => state)
-  );
-  console.log("Tutor Data from Redux:", tutorData);
-  console.log(
-    "LocalStorage tutorData:",
-    JSON.parse(localStorage.getItem("tutorData"))
-  );
   const theme = useSelector((state) => state.theme.theme);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axiosInterceptor.get("/tutor/dashboard");
+        console.log(response, "DASA");
+        setDashboardData(response.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast.error("Failed to fetch dashboard data");
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const handleLogoutConfirm = () => {
     toast.success("Tutor Logout Successful");
 
     setTimeout(() => {
       dispatch(logoutTutor());
-
       navigate("/tutor/tutor-login");
     }, 1000);
   };
@@ -80,120 +79,35 @@ const TutorHome = () => {
     setShowLogoutModal(true);
   };
 
-  const tutor = {
-    full_name: "Dr. Jane Smith",
-    avatar: "https://i.pravatar.cc/150?img=5",
-    rating: 4.8,
-    totalStudents: 3500,
-    totalCourses: 12,
-    totalEarnings: 75000,
-    revenueData: [
-      { month: "Jan", revenue: 4000 },
-      { month: "Feb", revenue: 5000 },
-      { month: "Mar", revenue: 6000 },
-      { month: "Apr", revenue: 5500 },
-      { month: "May", revenue: 7000 },
-      { month: "Jun", revenue: 7500 },
-    ],
+  const handleAddNewCourse = () => {
+    navigate("/tutor/createcourse");
   };
-
-  const upcomingClasses = [
-    {
-      id: 1,
-      title: "Advanced React Patterns",
-      time: "10:00 AM",
-      date: "2023-06-15",
-      students: 25,
-    },
-    {
-      id: 2,
-      title: "Data Structures in Python",
-      time: "2:00 PM",
-      date: "2023-06-16",
-      students: 30,
-    },
-    {
-      id: 3,
-      title: "Machine Learning Basics",
-      time: "11:00 AM",
-      date: "2023-06-17",
-      students: 20,
-    },
-  ];
-
-  const topCourses = [
-    {
-      id: 1,
-      title: "Advanced Machine Learning",
-      students: 1200,
-      rating: 4.9,
-      earnings: 25000,
-      progress: 80,
-    },
-    {
-      id: 2,
-      title: "Web Development Bootcamp",
-      students: 950,
-      rating: 4.8,
-      earnings: 20000,
-      progress: 75,
-    },
-    {
-      id: 3,
-      title: "Data Science Fundamentals",
-      students: 800,
-      rating: 4.7,
-      earnings: 18000,
-      progress: 70,
-    },
-  ];
-
-  const recentEnrollments = [
-    {
-      id: 1,
-      student: "Alex Johnson",
-      course: "Advanced Machine Learning",
-      date: "2023-06-10",
-    },
-    {
-      id: 2,
-      student: "Emma Davis",
-      course: "Web Development Bootcamp",
-      date: "2023-06-09",
-    },
-    {
-      id: 3,
-      student: "Michael Brown",
-      course: "Data Science Fundamentals",
-      date: "2023-06-08",
-    },
-    {
-      id: 4,
-      student: "Sophia Wilson",
-      course: "Advanced Machine Learning",
-      date: "2023-06-07",
-    },
-    {
-      id: 5,
-      student: "Daniel Lee",
-      course: "Web Development Bootcamp",
-      date: "2023-06-06",
-    },
-  ];
 
   const menuItem2 = [
     { icon: MdDashboard, label: "Dashboard", path: "/tutor/dashboard" },
     { icon: MdOutlinePerson, label: "Profile", path: "/tutor/tutor-profile" },
     { icon: MdLibraryBooks, label: "Courses", path: "/tutor/courses" },
-    { icon: MdAttachMoney, label: "Revenues", path: "/revenues" },
-    { icon: BsCameraVideo, label: "Chat & Video", path: "/chat-video" },
-    { icon: BsClipboardCheck, label: "Quiz", path: "/quiz" },
+    { icon: MdAttachMoney, label: "Revenues", path: "/tutor/revenue" },
+    { icon: BsCameraVideo, label: "Chat & Video", path: "/tutor/chat" },
+    { icon: BsClipboardCheck, label: "Quiz", path: "/tutor/quizmanage" },
+    { icon: MdReport, label: "Course Reports", path: "/tutor/courselist" },
   ];
 
-  const handleAddNewCourse = () => { 
-    navigate('/tutor/createcourse');
-  };
+  if (!dashboardData) {
+    return <div>Loading...</div>;
+  }
 
+  const {
+    tutor = {},
+    totalStudents = 0,
+    totalCourses = 0,
+    totalEarnings = 0,
+    averageRating = 0,
+    revenueData = [],
+    topCourses = [],
+    recentEnrollments = [],
+    latestCourses = [],
+  } = dashboardData;
 
   return (
     <>
@@ -232,7 +146,7 @@ const TutorHome = () => {
             </h1>
             <div className="flex items-center space-x-4">
               <button
-              onClick={handleAddNewCourse}
+                onClick={handleAddNewCourse}
                 className={`px-4 py-2 rounded-md ${
                   theme === "dark"
                     ? "bg-green-700 hover:bg-green-600"
@@ -267,22 +181,24 @@ const TutorHome = () => {
             </div>
             <div className="flex items-center space-x-4">
               <img
-                src={tutorData.profileImage || tutor.avatar}
-                alt={tutor.full_name}
+                src={
+                  tutor.profile_image ||
+                  tutor.profileImage ||
+                  "/placeholder.svg"
+                }
+                alt={tutor.full_name || "Tutor"}
                 className="w-20 h-20 rounded-full"
               />
               <div>
-                {tutorData ? (
-                  <h2 className="text-2xl font-bold">{tutorData.full_name}</h2>
-                ) : (
-                  <p className="text-red-500">Tutor data not available</p>
-                )}
+                <h2 className="text-2xl font-bold">
+                  {tutor.full_name || "Tutor Name"}
+                </h2>
                 <p
                   className={
                     theme === "dark" ? "text-green-400" : "text-green-600"
                   }
                 >
-                  Expert in Machine Learning and Web Development
+                  {tutor.bio || "Expert Tutor"}
                 </p>
                 <div className="flex items-center mt-2">
                   <Star size={16} className="text-yellow-400 mr-1" />
@@ -291,38 +207,38 @@ const TutorHome = () => {
                       theme === "dark" ? "text-green-400" : "text-green-600"
                     }`}
                   >
-                    {tutor.rating} Instructor Rating
+                    {averageRating.toFixed(1)} Instructor Rating
                   </span>
                 </div>
               </div>
             </div>
           </div>
           <br></br>
-          <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4 mt-8">
             {[
               {
                 title: "Total Students",
                 icon: faGraduationCap,
-                value: tutor.totalStudents,
-                subtext: "+20% from last month",
+                value: totalStudents,
+                subtext: "Unique enrolled students",
               },
               {
                 title: "Total Courses",
                 icon: faChalkboardTeacher,
-                value: tutor.totalCourses,
+                value: totalCourses,
                 subtext: "+2 new this month",
               },
               {
                 title: "Total Earnings",
                 icon: faMoneyBillWave,
-                value: `₹${tutor.totalEarnings}`,
-                subtext: "+15% from last month",
+                value: `₹${totalEarnings.toFixed(2)}`,
+                subtext: "After applying discounts",
               },
               {
                 title: "Average Rating",
                 icon: faStar,
-                value: tutor.rating,
-                subtext: "Based on 500+ reviews",
+                value: averageRating.toFixed(1),
+                subtext: "Based on all courses",
               },
             ].map((item, index) => (
               <div
@@ -350,28 +266,16 @@ const TutorHome = () => {
           </div>
 
           <div className="grid gap-6 mb-8 md:grid-cols-2">
-            <div
-              className={`p-6 rounded-lg shadow-md ${
-                theme === "dark"
-                  ? "bg-gray-800 border-green-700"
-                  : "bg-white border-green-200"
-              } border`}
-            >
-              <h2 className="text-xl font-bold mb-4">Revenue Overview</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={tutor.revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar
-                    dataKey="revenue"
-                    fill={theme === "dark" ? "#4ade80" : "#22c55e"}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            
+              <div
+                className={`p-6 rounded-lg shadow-md ${
+                  theme === "dark"
+                    ? "bg-gray-800 border-green-700"
+                    : "bg-white border-green-200"
+                } border`}
+              >
+                <RevenueOverview revenueData={revenueData} theme={theme} />
+              </div>
             <div
               className={`p-6 rounded-lg shadow-md ${
                 theme === "dark"
@@ -381,20 +285,24 @@ const TutorHome = () => {
             >
               <h2 className="text-xl font-bold mb-4">Top Performing Courses</h2>
               {topCourses.map((course) => (
-                <div key={course.id} className="mb-4 last:mb-0">
+                <div key={course._id} className="mb-4 last:mb-0">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">{course.title}</span>
-                    <span className="text-sm">${course.earnings}</span>
+                    <span className="text-sm">₹{course.earnings}</span>
                   </div>
                   <div className="w-full bg-green-200 rounded-full h-2.5 dark:bg-green-700">
                     <div
                       className="bg-green-600 h-2.5 rounded-full"
-                      style={{ width: `${course.progress}%` }}
+                      style={{
+                        width: `${(course.students / totalStudents) * 100}%`,
+                      }}
                     ></div>
                   </div>
                   <div className="flex justify-between items-center mt-2 text-xs">
                     <span>{course.students} students</span>
-                    <span>{course.rating} rating</span>
+                    <span>
+                      {course.rating ? course.rating.toFixed(1) : "0"} rating
+                    </span>
                   </div>
                 </div>
               ))}
@@ -409,23 +317,23 @@ const TutorHome = () => {
                   : "bg-white border-green-200"
               } border`}
             >
-              <h2 className="text-xl font-bold mb-4">Upcoming Classes</h2>
+              <h2 className="text-xl font-bold mb-4">Latest Courses</h2>
               <div className="grid gap-4">
-                {upcomingClasses.map((class_) => (
+                {latestCourses.map((course) => (
                   <div
-                    key={class_.id}
+                    key={course.id}
                     className={`p-4 rounded-lg ${
                       theme === "dark" ? "bg-gray-700" : "bg-green-100"
                     }`}
                   >
-                    <h3 className="text-lg font-semibold">{class_.title}</h3>
+                    <h3 className="text-lg font-semibold">{course.title}</h3>
                     <div className="mt-2 flex items-center">
-                      <Calendar size={16} className="mr-2" />
-                      {class_.date} at {class_.time}
+                      <BookOpen size={16} className="mr-2" />
+                      {course.lessons} lessons
                     </div>
                     <div className="mt-2 flex items-center">
                       <Users size={16} className="mr-2" />
-                      {class_.students} students enrolled
+                      {course.students} students enrolled
                     </div>
                     <button
                       className={`mt-4 w-full px-4 py-2 rounded-md ${
@@ -434,7 +342,7 @@ const TutorHome = () => {
                           : "bg-green-500 hover:bg-green-600"
                       } text-white`}
                     >
-                      Start Class
+                      View Course
                     </button>
                   </div>
                 ))}
@@ -460,10 +368,12 @@ const TutorHome = () => {
                 </thead>
                 <tbody>
                   {recentEnrollments.map((enrollment) => (
-                    <tr key={enrollment.id}>
+                    <tr key={enrollment._id}>
                       <td className="py-2">{enrollment.student}</td>
                       <td className="py-2">{enrollment.course}</td>
-                      <td className="py-2">{enrollment.date}</td>
+                      <td className="py-2">
+                        {new Date(enrollment.date).toLocaleDateString()}
+                      </td>
                       <td className="py-2">
                         <button
                           className={`p-1 rounded-md ${
@@ -494,3 +404,4 @@ const TutorHome = () => {
 };
 
 export default TutorHome;
+

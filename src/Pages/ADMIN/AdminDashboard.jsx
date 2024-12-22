@@ -1,34 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
+import axios from 'axios';
+import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
 } from 'chart.js';
-import { FaSearch, FaBell, FaDollarSign, FaUserGraduate, FaChalkboardTeacher, FaBook, FaBars, FaSun, FaMoon, FaUser } from 'react-icons/fa';
-import Sidebar from './Common/AdminSideBar';
+import { 
+  FaSearch, 
+  FaBell, 
+  FaDollarSign, 
+  FaUserGraduate, 
+  FaChalkboardTeacher, 
+  FaBook, 
+  FaBars, 
+  FaSun, 
+  FaMoon, 
+  FaUser 
+} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'react-toastify';
 import { logoutAdmin } from '../../Redux/Slices/adminSlice';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+import Sidebar from './Common/AdminSideBar';
+import axiosInterceptor from '@/axiosInstance';
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function Dashboard() {
+  // State management
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      totalRevenue: 0,
+      totalStudents: 0,
+      totalTutors: 0,
+      totalCourses: 0
+    },
+    chartData: {
+      monthlyRevenue: [],
+      topCourses: []
+    }
+  });
+
+  // Hooks
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const adminData = useSelector((state) => state?.admin?.adminDatas || {});
 
-  
+  // Theme management
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     setIsDarkMode(savedTheme === 'dark');
@@ -37,7 +76,37 @@ export default function Dashboard() {
     }
   }, []);
 
-  
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axiosInterceptor.get('/admin/dashboardstatus');
+        if (response.data.success) {
+          setDashboardData(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  // Handle sidebar clicks outside
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (isSidebarOpen && !e.target.closest('.sidebar') && !e.target.closest('.toggle-sidebar')) {
+        setIsSidebarOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, [isSidebarOpen]);
+
+  // Theme toggle handler
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     if (!isDarkMode) {
@@ -49,10 +118,12 @@ export default function Dashboard() {
     }
   };
 
+  // Sidebar toggle handler
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // Logout handlers
   const handleLogout = () => {
     setIsLogoutModalOpen(true);
   };
@@ -60,15 +131,11 @@ export default function Dashboard() {
   const confirmLogout = () => {
     dispatch(logoutAdmin());
     setIsLogoutModalOpen(false);
-    
-    
-    toast.success('Logged out successfully!', {
-      duration: 3000,
-      onAutoClose: () => navigate('/admin/adminlogin')
-    });
+    toast.success('Logged out successfully!');
+    navigate('/admin/adminlogin');
   };
 
-  
+  // Profile image component
   const ProfileImage = () => {
     const handleImageError = () => {
       setImageError(true);
@@ -94,33 +161,56 @@ export default function Dashboard() {
     );
   };
 
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (isSidebarOpen && !e.target.closest('.sidebar') && !e.target.closest('.toggle-sidebar')) {
-        setIsSidebarOpen(false);
-      }
-    };
-    document.addEventListener('click', handleOutsideClick);
-    return () => document.removeEventListener('click', handleOutsideClick);
-  }, [isSidebarOpen]);
+  // Stats configuration
+  const stats = [
+    { 
+      label: 'Total Revenue', 
+      value: `$${dashboardData.stats.totalRevenue.toLocaleString()}`,
+      icon: FaDollarSign 
+    },
+    { 
+      label: 'Total Students', 
+      value: dashboardData.stats.totalStudents.toLocaleString(),
+      icon: FaUserGraduate 
+    },
+    { 
+      label: 'Total Tutors', 
+      value: dashboardData.stats.totalTutors.toLocaleString(),
+      icon: FaChalkboardTeacher 
+    },
+    { 
+      label: 'Courses', 
+      value: dashboardData.stats.totalCourses.toLocaleString(),
+      icon: FaBook 
+    }
+  ];
 
-  
+  // Chart configurations
   const chartData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     datasets: [
       {
-        label: 'Income',
-        data: [30, 35, 45, 40, 50, 45, 40, 45, 35, 40, 35, 30],
+        label: 'Monthly Revenue',
+        data: dashboardData.chartData.monthlyRevenue,
         borderColor: '#22c55e',
         tension: 0.4,
         fill: false
+      }
+    ]
+  };
+
+  const topCoursesChart = {
+    labels: dashboardData.chartData.topCourses.map(course => course.name),
+    datasets: [
+      {
+        label: 'Revenue',
+        data: dashboardData.chartData.topCourses.map(course => course.revenue),
+        backgroundColor: '#22c55e',
       },
       {
-        label: 'Profit',
-        data: [20, 25, 35, 30, 40, 35, 30, 35, 25, 30, 25, 20],
-        borderColor: '#fbbf24',
-        tension: 0.4,
-        fill: false
+        label: 'Students',
+        data: dashboardData.chartData.topCourses.map(course => course.students),
+        backgroundColor: '#fbbf24',
       }
     ]
   };
@@ -157,13 +247,6 @@ export default function Dashboard() {
     }
   };
 
-  const stats = [
-    { label: 'Total Revenue', value: '$200.00', icon: FaDollarSign },
-    { label: 'Total Students', value: '551', icon: FaUserGraduate },
-    { label: 'Total Tutors', value: '120', icon: FaChalkboardTeacher },
-    { label: 'Courses', value: '23', icon: FaBook }
-  ];
-
   return (
     <div className={`flex min-h-screen ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       {/* Sidebar */}
@@ -176,6 +259,8 @@ export default function Dashboard() {
       >
         <Sidebar isDarkMode={isDarkMode} onLogout={handleLogout} />
       </div>
+
+      {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black opacity-30 lg:hidden z-10"
@@ -198,12 +283,13 @@ export default function Dashboard() {
             </h1>
           </div>
           
+          {/* Header Actions */}
           <div className="flex items-center gap-4 w-full sm:w-auto">
             {/* Search */}
             <div className="relative flex-1 sm:flex-none">
               <input
                 type="search"
-                placeholder="Search courses"
+                placeholder="Search..."
                 className={`w-full sm:w-64 px-4 py-2 pl-10 rounded-md border ${
                   isDarkMode 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -212,6 +298,8 @@ export default function Dashboard() {
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
+
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-full ${
@@ -227,11 +315,11 @@ export default function Dashboard() {
               <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             
-            {/* Profile Section */}
+            {/* Profile */}
             <div className="relative group">
               <ProfileImage />
               {adminData?.fullName && (
-                <div className={`absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 hidden group-hover:block
+                <div className={`absolute right-0 mt-2 py-2 w-48 rounded-md shadow-xl z-20 hidden group-hover:block
                   ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
                   <div className="px-4 py-2 text-sm">
                     <div className="font-medium">{adminData.fullName}</div>
@@ -245,39 +333,72 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-          {stats.map((stat) => (
-            <div 
-              key={stat.label} 
-              className={`${
-                isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-              } p-4 lg:p-6 rounded-lg shadow-sm flex items-center`}
-            >
-              <div className="mr-4 p-3 bg-green-100 rounded-full">
-                <stat.icon className="text-2xl text-green-500" />
-              </div>
-              <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                  {stat.label}
-                </p>
-                <p className="text-xl lg:text-2xl font-semibold mt-1">{stat.value}</p>
+        {/* Main Content */}
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+          </div>
+        ) : (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+              {stats.map((stat, index) => (
+                <div 
+                  key={index} 
+                  className={`${
+                    isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                  } p-4 lg:p-6 rounded-lg shadow-sm flex items-center`}
+                >
+                  <div className="mr-4 p-3 bg-green-100 rounded-full">
+                    <stat.icon className="text-2xl text-green-500" />
+                  </div>
+                  <div>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                      {stat.label}
+                    </p>
+                    <p className="text-xl lg:text-2xl font-semibold mt-1">{stat.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Revenue Chart */}
+            <div className={`${
+              isDarkMode ? 'bg-gray-800' : 'bg-white'
+            } p-4 lg:p-6 rounded-lg shadow-sm mb-8`}>
+              <h2 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                Monthly Revenue
+              </h2>
+              <div className="h-[300px] lg:h-[400px]">
+                <Line data={chartData} options={chartOptions} />
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Chart Section */}
-        <div className={`${
-          isDarkMode ? 'bg-gray-800' : 'bg-white'
-        } p-4 lg:p-6 rounded-lg shadow-sm`}>
-          <h2 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            Income & Expense
-          </h2>
-          <div className="h-[300px] lg:h-[400px]">
-            <Line data={chartData} options={chartOptions} />
-          </div>
-        </div>
+            {/* Top Courses Chart */}
+            <div className={`${
+              isDarkMode ? 'bg-gray-800' : 'bg-white'
+            } p-4 lg:p-6 rounded-lg shadow-sm`}>
+              <h2 className={`text-lg font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                Top Performing Courses
+              </h2>
+              <div className="h-[300px] lg:h-[400px]">
+                <Bar 
+                  data={topCoursesChart} 
+                  options={{
+                    ...chartOptions,
+                    scales: {
+                      ...chartOptions.scales,
+                      y: {
+                        ...chartOptions.scales.y,
+                        stacked: false
+                      }
+                    }
+                  }} 
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Logout Confirmation Modal */}
         {isLogoutModalOpen && (

@@ -10,7 +10,7 @@ export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme.theme);
   const tutor = useSelector((state) => state.tutor.tutorData);
-  console.log("Header Data",tutor)
+  console.log("Header Data", tutor);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   return (
@@ -74,7 +74,6 @@ export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
           </span>
         </div>
 
-        
         {/* Right Section: Search Toggle, Profile, and Theme */}
         <div className="flex items-center gap-4">
           {/* Mobile Search Toggle */}
@@ -88,7 +87,7 @@ export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
           </Button>
 
           <img
-            src={tutor.profileImage || avatar}
+            src={tutor.profile_image || tutor.profileImage || avatar}
             alt="Profile"
             className="h-8 w-8 rounded-full object-cover"
           />

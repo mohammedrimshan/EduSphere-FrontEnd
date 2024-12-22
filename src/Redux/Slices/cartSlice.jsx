@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
+import axiosInterceptor from '@/axiosInstance';
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/user";
 export const fetchCart = createAsyncThunk(
   'cart/fetchCart',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/${userId}/cart`);
+      const response = await axiosInterceptor.get(`/user/${userId}/cart`);
 
       const processedItems = response.data.cart.items.map(item => ({
         ...item,
@@ -29,13 +29,13 @@ export const addToCart = createAsyncThunk(
     'cart/addToCart',
     async ({ userId, courseId, price, offer_percentage }, { rejectWithValue }) => {
       try {
-        const response = await axios.post(`${API_BASE_URL}/${userId}/cartadd`, {
+        const response = await axiosInterceptor.post(`/user/${userId}/cartadd`, {
           courseId,
           price,
           offer_percentage
         });
   
-        if (!response.data.success | !response.data.cart) {
+        if (!response.data.success) {
           throw new Error(response.data.message || 'Failed to add to cart');
         }
   
@@ -45,6 +45,7 @@ export const addToCart = createAsyncThunk(
         }));
   
         return {
+          success:true,
           ...response.data.cart,
           items: processedItems,
            message: 'Course added to cart successfully'
@@ -62,7 +63,7 @@ export const removeFromCart = createAsyncThunk(
     'cart/removeFromCart',
     async ({ userId, courseId }, { rejectWithValue }) => {
       try {
-        const response = await axios.delete(`${API_BASE_URL}/${userId}/cartremove`, {
+        const response = await axiosInterceptor.delete(`/user/${userId}/cartremove`, {
           data: { courseId }
         });
   
@@ -72,6 +73,7 @@ export const removeFromCart = createAsyncThunk(
         }));
   
         return {
+          success:true,
           ...response.data.cart,
           items: processedItems
         };
@@ -88,11 +90,8 @@ export const clearCart = createAsyncThunk(
     'cart/clearCart',
     async (userId, { rejectWithValue }) => {
       try {
-        const response = await axios.delete(`${API_BASE_URL}/${userId}/cartclear`);
-        return {
-          ...response.data.cart,
-          items: []
-        };
+        const response = await axiosInterceptor.delete(`/user/${userId}/cartclear`);
+        return response.data.cart;
       } catch (error) {
         console.error('Clear Cart Error:', error);
         return rejectWithValue(error.response?.data || 'Failed to clear cart');
@@ -127,7 +126,7 @@ const cartSlice = createSlice({
         : [];
       state.totalCartPrice = action.payload.totalCartPrice || 0;
       state.error = null;
-      state.successMessage = action.payload.message;
+      state.successMessage = action.payload.message || 'Cart fetched successfully';
     })
     .addCase(fetchCart.rejected, (state, action) => {
       state.status = 'failed';
@@ -170,6 +169,9 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalCartPrice = 0;
       state.error = null;
+    })
+    .addCase(clearCart.rejected, (state, action) => {
+      console.error("Failed to clear cart:", action.error.message);
     });
 }
 });

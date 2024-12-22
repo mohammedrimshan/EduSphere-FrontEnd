@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import axiosInterceptor from '@/axiosInstance';
 import { toast, Toaster } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';  // Import Eye and EyeOff icons
@@ -28,7 +29,7 @@ const TutorResetPassword = () => {
     useEffect(() => {
         const verifyToken = async () => {
             try {
-                await axios.get(`${API_BASE_URL}/verify-reset-token/${token}`);
+                await axiosInterceptor.get(`/tutor/verify-reset-token/${token}`);
                 setValidToken(true);
             } catch (error) {
                 setValidToken(false);
@@ -79,7 +80,7 @@ const TutorResetPassword = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/tutorreset-password`, { token, newPassword });
+            const response = await axiosInterceptor.post(`/tutor/tutorreset-password`, { token, newPassword });
             toast.success(response.data.message);
             setTimeout(() => {
                 navigate('/tutor/tutor-login');

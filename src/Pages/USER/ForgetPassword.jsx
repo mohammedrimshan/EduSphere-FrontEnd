@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import { toast, Toaster } from 'sonner';
 import Reset from "../../assets/Reset.jpg";
-
+import axiosInterceptor from "@/axiosInstance";
 // Modal Component
 const Modal = ({ open, onClose, children }) => {
   if (!open) return null;
@@ -74,7 +74,7 @@ const ForgetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/forgot-password`, {
+      const response = await axiosInterceptor.post(`/user/forgot-password`, {
         email,
       });
       toast.success(response.data.message);

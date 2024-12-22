@@ -20,6 +20,8 @@ import {
   MdOutlineShoppingCart,
   MdOutlineFavoriteBorder,
   MdOutlineReceiptLong,
+  MdOutlineHome,
+  MdAccountBalanceWallet,
 } from "react-icons/md";
 import {
   BsCameraVideo,
@@ -44,18 +46,22 @@ import { toast, Toaster } from "sonner";
 import avatar from "../../assets/avt.webp";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
-import {
-  fetchCart,
-  clearCart,
-} from "../../Redux/Slices/cartSlice";
+import { fetchCart, clearCart } from "../../Redux/Slices/cartSlice";
+import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
+import axiosInterceptor from "@/axiosInstance";
+import { setCourses } from "../../Redux/Slices/courseSlice";
 export default function UserHomePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userDatas);
-  console.log(user)
+  console.log(user, "darahjghfjgh");
   const theme = useSelector((state) => state.theme.theme);
+  const courses = useSelector((state) => state.course.courseDatas) || [];
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [favorites, setFavorites] = useState({});
+  const [showAllCourses, setShowAllCourses] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
   // If user is null, show loading or redirect
   if (!user) {
@@ -76,6 +82,51 @@ export default function UserHomePage() {
     );
   }
 
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInterceptor.get(`/user/courses`, {
+        withCredentials: true,
+      });
+      if (response.data && response.data.courses) {
+        const filteredCourses = response.data.courses.filter(
+          (course) => !course.isBanned
+        );
+        dispatch(setCourses({ courses: filteredCourses, isTutor: false }));
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      toast.error("Failed to fetch courses");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleFavorite = async (courseId) => {
+    try {
+      const isFavorite = favorites[courseId];
+      if (isFavorite) {
+        await axiosInterceptor.delete(`/user/removewishlist/${courseId}`);
+      } else {
+        await axiosInterceptor.post("/user/addwishlist", { courseId });
+      }
+      setFavorites((prev) => ({
+        ...prev,
+        [courseId]: !isFavorite,
+      }));
+      toast.success(
+        `Course ${isFavorite ? "removed from" : "added to"} wishlist`
+      );
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+      toast.error("Failed to update wishlist");
+    }
+  };
+
   const handleLogoutConfirm = () => {
     toast.success("Logout Successful");
     setTimeout(() => {
@@ -88,42 +139,6 @@ export default function UserHomePage() {
     setShowLogoutModal(true);
   };
 
-  // Course data
-  const courses = [
-    {
-      title: "Beginner's Guide to Design",
-      image: Graphics,
-      price: "$149.9",
-      instructor: "Ronald Richards",
-      duration: "22 Total Hours, 155 Lectures, Beginner",
-      ratings: 1200,
-    },
-    {
-      title: "Beginner's Guide to HTML",
-      image: HTML,
-      price: "$149.9",
-      instructor: "Ronald Richards",
-      duration: "22 Total Hours, 155 Lectures, Beginner",
-      ratings: 1200,
-    },
-    {
-      title: "MongoDB Essentials",
-      image: MONGO,
-      price: "$149.9",
-      instructor: "Ronald Richards",
-      duration: "22 Total Hours, 155 Lectures, Beginner",
-      ratings: 1200,
-    },
-    {
-      title: "SQL Masterclass",
-      image: SQL,
-      price: "$149.9",
-      instructor: "Ronald Richards",
-      duration: "22 Total Hours, 155 Lectures, Beginner",
-      ratings: 1200,
-    },
-  ];
-
   // Categories data
   const categories = [
     { title: "Design", icon: Palette, color: "green", courses: 11 },
@@ -133,12 +148,31 @@ export default function UserHomePage() {
   ];
 
   const menuItems = [
+    { icon: MdOutlineHome, label: "Home", path: "/user/home" },
     { icon: MdOutlinePerson, label: "Profile", path: "/user/profile" },
-    { icon: MdLibraryBooks, label: "My Courses", path: "/my-courses" },
-    { icon: BsPeopleFill, label: "Teachers", path: "/teachers" },
-    { icon: MdOutlineShoppingCart, label: "My Orders", path: "/my-orders" },
-    { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/wishlist" },
-    { icon: BsFillAwardFill, label: "Certificates", path: "/certificates" },
+    { icon: MdLibraryBooks, label: "My Courses", path: "/user/my-courses" },
+    { icon: BsPeopleFill, label: "Teachers", path: "/user/mytutors" },
+    {
+      icon: MdOutlineShoppingCart,
+      label: "My Orders",
+      path: "/user/payments/status",
+    },
+    {
+      icon: MdOutlineFavoriteBorder,
+      label: "Wishlist",
+      path: "/user/wishlist",
+    },
+    {
+      icon: BsFillAwardFill,
+      label: "Certificates",
+      path: "/user/certificates",
+    },
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   return (
@@ -153,23 +187,23 @@ export default function UserHomePage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Toaster position="top-left" richColors />
-        
         <Header
           isOpen={isOpen}
           setIsOpen={setIsOpen}
           handleLogoutClick={handleLogoutClick}
         />
-        
+
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto scrollbar-hide">
           {/* Welcome Section */}
           <section className="container mx-auto px-4 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900 dark:text-white">
                   Welcome,{" "}
-                  <span className="text-green-500">{user?.full_name || "Guest"}</span>
+                  <span className="text-green-500">
+                    {user?.full_name || "Guest"}
+                  </span>
                 </h1>
                 <p className="text-xl text-gray-600 dark:text-gray-400">
                   Continue your learning journey with personalized courses and
@@ -198,51 +232,120 @@ export default function UserHomePage() {
             </div>
           </section>
           {/* Course Cards */}
+          {/* Course Cards */}
           <section className="container mx-auto px-4 py-20">
             <div className="space-y-12">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold dark:text-white">
-                  Recommended Courses
+                  All Courses
                 </h2>
-                <a href="#" className="text-green-500 hover:underline">
-                  See All
-                </a>
+                <button
+                  onClick={() => setShowAllCourses(!showAllCourses)}
+                  className="text-green-500 hover:underline"
+                >
+                  {showAllCourses ? "Show Less" : "See All"}
+                </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {courses.map((course, index) => (
-                  <Card
-                    key={index}
-                    className="overflow-hidden bg-white dark:bg-gray-800"
+              <div
+                className={`
+        ${
+          showAllCourses
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            : "flex overflow-x-auto gap-4 pb-4 no-scrollbar"
+        }
+      `}
+                style={
+                  !showAllCourses
+                    ? {
+                        "-ms-overflow-style": "none",
+                        scrollbarWidth: "none",
+                      }
+                    : {}
+                }
+              >
+                {courses.map((course) => (
+                  <div
+                    key={course._id}
+                    className={!showAllCourses ? "flex-none w-[300px]" : ""}
+                    onClick={() => navigate(`/user/courseview/${course._id}`)}
                   >
-                    <img
-                      alt={course.title}
-                      className="w-full h-48 object-cover"
-                      src={course.image}
-                    />
-                    <div className="p-4 space-y-2">
-                      <h3 className="font-semibold dark:text-white">
-                        {course.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        by {course.instructor}
-                      </p>
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                    <div className="h-full border rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer relative">
+                      <img
+                        src={
+                          course.course_thumbnail ||
+                          "/placeholder.svg?height=200&width=400"
+                        }
+                        alt={course.title}
+                        className="w-full h-40 object-cover"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(course._id);
+                        }}
+                        className="absolute top-2 right-2 bg-white rounded-full p-1"
+                      >
+                        {favorites[course._id] ? (
+                          <MdFavorite className="text-red-500 w-6 h-6" />
+                        ) : (
+                          <MdFavoriteBorder className="w-6 h-6" />
+                        )}
+                      </button>
+                      <div className="p-4">
+                        <h3 className="font-medium mb-2  dark:text-white">{course.title}</h3>
+                        <div className="flex items-center gap-2 mb-2">
+                          <img
+                            src={
+                              course.tutor?.profile_image ||
+                              "/placeholder.svg?height=40&width=40"
+                            }
+                            alt={course.tutor?.full_name || "Tutor"}
+                            className="w-8 h-8 rounded-full"
                           />
-                        ))}
-                        <span className="text-sm text-gray-600">
-                          ({course.ratings})
-                        </span>
+                          <span className="text-sm text-gray-600">
+                            {course.tutor?.full_name || "Unknown Tutor"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex text-yellow-400">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.floor(course.rating || 0)
+                                    ? "fill-current"
+                                    : ""
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            ({course.reviews?.length || 0} reviews)
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-500 font-semibold">
+                            ₹
+                            {Math.round(
+                              course.price -
+                                course.price *
+                                  ((course.offer_percentage || 0) / 100)
+                            )}
+                          </span>
+                          {course.offer_percentage > 0 && (
+                            <>
+                              <span className="text-gray-400 line-through text-sm">
+                                ₹{course.price}
+                              </span>
+                              <span className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded">
+                                {course.offer_percentage}% OFF
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {course.duration}
-                      </p>
-                      <p className="font-bold text-green-500">{course.price}</p>
                     </div>
-                  </Card>
+                  </div>
                 ))}
               </div>
             </div>

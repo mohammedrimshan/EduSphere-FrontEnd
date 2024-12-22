@@ -16,6 +16,16 @@ const courseSlice = createSlice({
         return [];
       }
     })(),
+    lessonProgress: (() => {
+      try {
+        const storedProgress = localStorage.getItem("lessonProgress");
+        return storedProgress ? JSON.parse(storedProgress) : {};
+      } catch (error) {
+        console.warn("Error parsing lessonProgress from localStorage:", error);
+        localStorage.removeItem("lessonProgress");
+        return {};
+      }
+    })(),
     loading: false,
     error: null,
   },
@@ -143,6 +153,35 @@ const courseSlice = createSlice({
       const { courseId, offerPrice } = action.payload;
       state.offerPrices[courseId] = offerPrice;
     },
+    updateLessonProgress: (state, action) => {
+      const { lessonId, progress, userId } = action.payload;
+      // Store progress by user ID to handle multiple users
+      if (!state.lessonProgress[userId]) {
+        state.lessonProgress[userId] = {};
+      }
+      state.lessonProgress[userId][lessonId] = progress;
+      // Save to localStorage
+      localStorage.setItem("lessonProgress", JSON.stringify(state.lessonProgress));
+    },
+
+    // Load progress for a specific user
+    loadUserProgress: (state, action) => {
+      const userId = action.payload;
+      const storedProgress = state.lessonProgress[userId] || {};
+      return {
+        ...state,
+        currentUserProgress: storedProgress
+      };
+    },
+
+    // Clear progress when user logs out
+    clearUserProgress: (state, action) => {
+      const userId = action.payload;
+      if (state.lessonProgress[userId]) {
+        delete state.lessonProgress[userId];
+        localStorage.setItem("lessonProgress", JSON.stringify(state.lessonProgress));
+      }
+    },
   }
 });
 
@@ -158,7 +197,10 @@ export const {
   updateLesson,
   deleteLesson,
   setOfferPrice ,
-  deleteLessonSuccess
+  deleteLessonSuccess,
+  updateLessonProgress,
+  loadUserProgress,
+  clearUserProgress
 } = courseSlice.actions;
 
 export default courseSlice.reducer;

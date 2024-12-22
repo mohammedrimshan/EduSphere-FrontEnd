@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams,Link } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import { Cropper } from "react-cropper";
+import "cropperjs/dist/cropper.css";
 import { toast } from "sonner";
 import {
   Book,
@@ -12,6 +13,7 @@ import {
   Layers,
   Clock,
   Edit,
+  X,
 } from "lucide-react";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
 import {
@@ -19,6 +21,7 @@ import {
   MdOutlinePerson,
   MdLibraryBooks,
   MdAttachMoney,
+  MdReport
 } from "react-icons/md";
 import { FaGraduationCap, FaPercentage } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -34,6 +37,98 @@ import {
   setCourses,
 } from "../../Redux/Slices/courseSlice";
 import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+import axiosInterceptor from "@/axiosInstance";
+
+const CropperModal = ({ isOpen, onClose, image, onCropComplete, theme }) => {
+  const [cropper, setCropper] = useState(null);
+
+  const handleCrop = () => {
+    if (cropper) {
+      const croppedCanvas = cropper.getCroppedCanvas();
+      croppedCanvas.toBlob((blob) => {
+        onCropComplete(blob);
+        onClose();
+      });
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div
+        className={`relative w-full max-w-2xl ${
+          theme === "dark" ? "bg-gray-800" : "bg-white"
+        } rounded-lg shadow-xl`}
+      >
+        <div
+          className={`p-4 border-b ${
+            theme === "dark" ? "border-gray-700" : "border-gray-200"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <h3
+              className={`text-lg font-semibold ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Crop Image
+            </h3>
+            <button
+              onClick={onClose}
+              className={`p-1 rounded-full hover:bg-gray-100 ${
+                theme === "dark" ? "hover:bg-gray-700" : ""
+              }`}
+            >
+              <X
+                className={`w-5 h-5 ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+        <div className="p-4">
+          <Cropper
+            src={image}
+            style={{ height: 400, width: "100%" }}
+            aspectRatio={16 / 9}
+            guides={true}
+            onInitialized={(instance) => setCropper(instance)}
+          />
+        </div>
+        <div
+          className={`p-4 border-t ${
+            theme === "dark" ? "border-gray-700" : "border-gray-200"
+          }`}
+        >
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={onClose}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCrop}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
+                theme === "dark"
+                  ? "bg-green-700 hover:bg-green-600"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              Apply Crop
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const EditCoursePage = () => {
   const navigate = useNavigate();
@@ -55,6 +150,8 @@ const EditCoursePage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [lessons, setLessons] = useState([]);
+  const [showCropper, setShowCropper] = useState(false);
+  const [cropperImage, setCropperImage] = useState(null);
   const [courseData, setCourseData] = useState({
     title: "",
     category: "",
@@ -72,8 +169,8 @@ const EditCoursePage = () => {
     const fetchCourseData = async () => {
       try {
         dispatch(setLoading(true));
-        const response = await axios.get(
-          `${API_BASE_URL}/tutor/courses/${courseId}`
+        const response = await axiosInterceptor.get(
+          `/tutor/courses/${courseId}`
         );
         const fetchedCourse = response.data.course;
 
@@ -104,8 +201,10 @@ const EditCoursePage = () => {
 
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/admin/categories`);
-        setCategories(response.data.filter((category) => category.isVisible));
+        // Add all=true query parameter to get all categories
+        const response = await axiosInterceptor.get(`/tutor/categories?all=true`);
+        const categoriesData = response.data.categories;
+        setCategories(categoriesData.filter((category) => category.isVisible));
       } catch (error) {
         console.error("Error fetching categories:", error);
         toast.error("Failed to fetch categories");
@@ -125,9 +224,7 @@ const EditCoursePage = () => {
   const fetchLessons = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `${API_BASE_URL}/tutor/lessons/${courseId}`
-      );
+      const response = await axiosInterceptor.get(`/tutor/lessons/${courseId}`);
       const fetchedLessons = Array.isArray(response.data.data)
         ? response.data.data
         : [];
@@ -188,12 +285,26 @@ const EditCoursePage = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files[0];
     if (file) {
-      handleFiles(file);
-      const previewURL = URL.createObjectURL(file);
-      setImagePreview(previewURL);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropperImage(reader.result);
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  // Add this new function to handle the cropped image:
+  const handleCroppedImage = (blob) => {
+    const file = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+    const previewURL = URL.createObjectURL(blob);
+    setImagePreview(previewURL);
+    setCourseData((prevData) => ({
+      ...prevData,
+      course_thumbnail: file,
+    }));
   };
 
   const handleImageUpload = async (file) => {
@@ -250,8 +361,8 @@ const EditCoursePage = () => {
       };
 
       console.log("Updating course with payload:", coursePayload);
-      const response = await axios.put(
-        `${API_BASE_URL}/tutor/courses/${courseId}`,
+      const response = await axiosInterceptor.put(
+        `/tutor/courses/${courseId}`,
         coursePayload
       );
 
@@ -270,24 +381,26 @@ const EditCoursePage = () => {
     }
   };
 
-
   const handleAddLessonClick = () => {
     if (currentCourse && currentCourse._id) {
       navigate(`/tutor/${currentCourse._id}/addlesson`);
     } else {
-      toast.error("Course data is not available. Please try reloading the page.");
+      toast.error(
+        "Course data is not available. Please try reloading the page."
+      );
     }
   };
 
-  const menuItems = [
+  const menuItem2 = [
     { icon: MdDashboard, label: "Dashboard", path: "/tutor/dashboard" },
     { icon: MdOutlinePerson, label: "Profile", path: "/tutor/tutor-profile" },
     { icon: MdLibraryBooks, label: "Courses", path: "/tutor/courses" },
-    { icon: MdAttachMoney, label: "Revenues", path: "/tutor/revenues" },
-    { icon: BsCameraVideo, label: "Chat & Video", path: "/tutor/chat-video" },
-    { icon: BsClipboardCheck, label: "Quiz", path: "/tutor/quiz" },
+    { icon: MdAttachMoney, label: "Revenues", path: "/revenues" },
+    { icon: BsCameraVideo, label: "Chat & Video", path: "/tutor/chat" },
+    { icon: BsClipboardCheck, label: "Quiz", path: "/tutor/quizmanage" },
+    { icon: MdReport, label: "Course Reports", path: "/tutor/courselist" }, 
   ];
-
+  
   const themeClasses = {
     background:
       theme === "dark"
@@ -312,7 +425,7 @@ const EditCoursePage = () => {
         onClose={() => setIsOpen(false)}
         theme={theme}
         handleLogout={handleLogoutClick}
-        menuItems={menuItems}
+        menuItems={menuItem2}
       />
       <TutorHeader
         isOpen={isOpen}
@@ -335,13 +448,13 @@ const EditCoursePage = () => {
             </p>
           </div>
           <div className="p-4 flex justify-end">
-          <button
+            <button
               type="button"
               onClick={handleAddLessonClick}
               className="flex items-center px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600 transition-colors"
             >
               <Book className="w-4 h-4 mr-2" />
-              Add  & Edit Lesson
+              Add & Edit Lesson
             </button>
           </div>
 
@@ -552,7 +665,6 @@ const EditCoursePage = () => {
               </div>
             </div>
             <div className="flex justify-end space-x-4">
-          
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -570,7 +682,7 @@ const EditCoursePage = () => {
             </div>
           </form>
         </div>
-        
+
         {/* Lessons List */}
         <div
           className={`mt-8 max-w-4xl mx-auto ${themeClasses.container} rounded-xl shadow-lg overflow-hidden`}
@@ -580,7 +692,6 @@ const EditCoursePage = () => {
               <Book className="mr-2" />
               Course Lessons
             </h2>
-            
           </div>
           <div
             className={`p-8 ${
@@ -619,6 +730,13 @@ const EditCoursePage = () => {
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
         onConfirm={handleLogoutConfirm}
+      />
+      <CropperModal
+        isOpen={showCropper}
+        onClose={() => setShowCropper(false)}
+        image={cropperImage}
+        onCropComplete={handleCroppedImage}
+        theme={theme}
       />
       <Footer />
     </>

@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import { X } from "lucide-react";
 import {
   FiPlus,
   FiTrash2,
@@ -23,6 +25,7 @@ import {
   MdOutlinePerson,
   MdLibraryBooks,
   MdAttachMoney,
+  MdReport,
 } from "react-icons/md";
 import LogoutModal from "@/ui/LogOutModal";
 import { toast } from "sonner";
@@ -37,6 +40,98 @@ import {
   deleteLesson,
 } from "../../Redux/Slices/courseSlice";
 import DeleteConfirmationModal from "./Common/DeleteModal";
+import axiosInterceptor from "@/axiosInstance";
+
+const CropperModal = ({ isOpen, onClose, image, onCropComplete, theme }) => {
+  const [cropper, setCropper] = useState(null);
+
+  const handleCrop = () => {
+    if (cropper) {
+      const croppedCanvas = cropper.getCroppedCanvas();
+      croppedCanvas.toBlob((blob) => {
+        onCropComplete(blob);
+        onClose();
+      });
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div
+        className={`relative w-full max-w-2xl ${
+          theme === "dark" ? "bg-gray-800" : "bg-white"
+        } rounded-lg shadow-xl`}
+      >
+        <div
+          className={`p-4 border-b ${
+            theme === "dark" ? "border-gray-700" : "border-gray-200"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <h3
+              className={`text-lg font-semibold ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Crop Image
+            </h3>
+            <button
+              onClick={onClose}
+              className={`p-1 rounded-full hover:bg-gray-100 ${
+                theme === "dark" ? "hover:bg-gray-700" : ""
+              }`}
+            >
+              <X
+                className={`w-5 h-5 ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+        <div className="p-4">
+          <Cropper
+            src={image}
+            style={{ height: 400, width: "100%" }}
+            aspectRatio={16 / 9}
+            guides={true}
+            onInitialized={(instance) => setCropper(instance)}
+          />
+        </div>
+        <div
+          className={`p-4 border-t ${
+            theme === "dark" ? "border-gray-700" : "border-gray-200"
+          }`}
+        >
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={onClose}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCrop}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
+                theme === "dark"
+                  ? "bg-green-700 hover:bg-green-600"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              Apply Crop
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LessonManager = () => {
   const navigate = useNavigate();
@@ -45,7 +140,9 @@ const LessonManager = () => {
   const tutorData = useSelector((state) => state.tutor.tutorData);
   const theme = useSelector((state) => state.theme.theme);
   const courseDatas = useSelector((state) => state.course.courseDatas);
-  const [course, setCourse] = useState(() => courseDatas?.find((c) => c._id === courseId));
+  const [course, setCourse] = useState(() =>
+    courseDatas?.find((c) => c._id === courseId)
+  );
   const [lessons, setLessons] = useState([]);
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
@@ -68,6 +165,9 @@ const LessonManager = () => {
   const [lessonToDelete, setLessonToDelete] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [pdfPreview, setPdfPreview] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [cropperImage, setCropperImage] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -88,8 +188,10 @@ const LessonManager = () => {
   const fetchLessons = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/tutor/lessons/${courseId}`);
-      const fetchedLessons = Array.isArray(response.data.data) ? response.data.data : [];
+      const response = await axiosInterceptor.get(`/tutor/lessons/${courseId}`);
+      const fetchedLessons = Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
       setLessons(fetchedLessons);
       setCourse((prevCourse) => ({
         ...prevCourse,
@@ -130,8 +232,19 @@ const LessonManager = () => {
         toast.error("Thumbnail size should be less than 5MB");
         return;
       }
-      setVideoThumbnail(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropperImage(reader.result);
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  // Add handler for cropped image
+  const handleCroppedImage = (blob) => {
+    setVideoThumbnail(blob);
+    setThumbnailPreview(URL.createObjectURL(blob));
   };
 
   const handlePdfChange = (e) => {
@@ -187,7 +300,14 @@ const LessonManager = () => {
   const addLesson = async (e) => {
     e.preventDefault();
 
-    if (!title.trim() || !duration || !description.trim() || !videoFile || !videoThumbnail || !pdfFile) {
+    if (
+      !title.trim() ||
+      !duration ||
+      !description.trim() ||
+      !videoFile ||
+      !videoThumbnail ||
+      !pdfFile
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -221,18 +341,22 @@ const LessonManager = () => {
         tutor: tutorData?.id,
       };
 
-      const response = await axios.post(`${API_BASE_URL}/tutor/addlesson/${courseId}`, lessonData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axiosInterceptor.post(
+        `/tutor/addlesson/${courseId}`,
+        lessonData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.data.success) {
         const newLesson = response.data.data.lesson;
         toast.success("Lesson added successfully!", { id: uploadToast });
-        
+
         dispatch(addLessonToCourse({ courseId, lesson: newLesson }));
-        
+
         setLessons((prevLessons) => [...prevLessons, newLesson]);
-        
+
         setCourse((prevCourse) => ({
           ...prevCourse,
           lessons: [...(prevCourse.lessons || []), newLesson],
@@ -256,15 +380,20 @@ const LessonManager = () => {
 
   const handleCourseSubmit = async () => {
     if (!course?.lessons?.length) {
-      toast.error("Please add at least one lesson before submitting the course");
+      toast.error(
+        "Please add at least one lesson before submitting the course"
+      );
       return;
     }
 
     setIsSubmittingCourse(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/tutor/submit-course/${courseId}`, {
-        lessons: course.lessons.map((lesson) => lesson._id),
-      });
+      const response = await axiosInterceptor.post(
+        `/tutor/submit-course/${courseId}`,
+        {
+          lessons: course.lessons.map((lesson) => lesson._id),
+        }
+      );
 
       if (response.data.success) {
         toast.success("Course submitted successfully!");
@@ -294,10 +423,10 @@ const LessonManager = () => {
     if (thumbnailRef.current) thumbnailRef.current.value = "";
     if (pdfRef.current) pdfRef.current.value = "";
     setUploadProgress(0);
-  
-  // Reset editing states
-  setIsEditing(false);
-  setEditingLessonId(null);
+
+    // Reset editing states
+    setIsEditing(false);
+    setEditingLessonId(null);
   };
 
   const handleLogoutConfirm = () => {
@@ -346,7 +475,9 @@ const LessonManager = () => {
     setUploadProgress(0);
 
     try {
-      const uploadToast = toast.loading(isEditing ? "Updating lesson..." : "Uploading files...");
+      const uploadToast = toast.loading(
+        isEditing ? "Updating lesson..." : "Uploading files..."
+      );
 
       let videoUrl, thumbnailUrl, pdfUrl;
 
@@ -361,7 +492,9 @@ const LessonManager = () => {
       }
 
       if (isEditing) {
-        const currentLesson = course.lessons.find(l => l._id === editingLessonId);
+        const currentLesson = course.lessons.find(
+          (l) => l._id === editingLessonId
+        );
         if (!videoUrl) videoUrl = currentLesson.video;
         if (!thumbnailUrl) thumbnailUrl = currentLesson.video_thumbnail;
         if (!pdfUrl) pdfUrl = currentLesson.pdf_note;
@@ -379,28 +512,51 @@ const LessonManager = () => {
 
       let response;
       if (isEditing) {
-        response = await axios.put(`${API_BASE_URL}/tutor/lessons/${editingLessonId}`, lessonData, {
-          headers: { "Content-Type": "application/json" },
-        });
+        response = await axiosInterceptor.put(
+          `/tutor/lessons/${editingLessonId}`,
+          lessonData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       } else {
-        response = await axios.post(`${API_BASE_URL}/tutor/addlesson/${courseId}`, lessonData, {
-          headers: { "Content-Type": "application/json" },
-        });
+        response = await axiosInterceptor.post(
+          `/tutor/addlesson/${courseId}`,
+          lessonData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
 
       if (response.data.success) {
-        toast.success(isEditing ? "Lesson updated successfully!" : "Lesson added successfully!", { id: uploadToast });
+        toast.success(
+          isEditing
+            ? "Lesson updated successfully!"
+            : "Lesson added successfully!",
+          { id: uploadToast }
+        );
 
         if (isEditing) {
-          dispatch(updateLesson({ courseId, lessonId: editingLessonId, updatedLesson: response.data.data.lesson }));
+          dispatch(
+            updateLesson({
+              courseId,
+              lessonId: editingLessonId,
+              updatedLesson: response.data.data.lesson,
+            })
+          );
           setCourse((prevCourse) => ({
             ...prevCourse,
-            lessons: prevCourse.lessons.map(lesson => 
-              lesson._id === editingLessonId ? response.data.data.lesson : lesson
+            lessons: prevCourse.lessons.map((lesson) =>
+              lesson._id === editingLessonId
+                ? response.data.data.lesson
+                : lesson
             ),
           }));
         } else {
-          dispatch(addLessonToCourse({ courseId, lesson: response.data.data.lesson }));
+          dispatch(
+            addLessonToCourse({ courseId, lesson: response.data.data.lesson })
+          );
           setCourse((prevCourse) => ({
             ...prevCourse,
             lessons: [...(prevCourse.lessons || []), response.data.data.lesson],
@@ -411,10 +567,16 @@ const LessonManager = () => {
         setIsEditing(false);
         setEditingLessonId(null);
       } else {
-        throw new Error(response.data.message || `Failed to ${isEditing ? "update" : "add"} lesson`);
+        throw new Error(
+          response.data.message ||
+            `Failed to ${isEditing ? "update" : "add"} lesson`
+        );
       }
     } catch (error) {
-      console.error(`Error ${isEditing ? "updating" : "adding"} lesson:`, error);
+      console.error(
+        `Error ${isEditing ? "updating" : "adding"} lesson:`,
+        error
+      );
       const errorMessage = error.response?.data?.message || error.message;
       dispatch(setError(errorMessage));
       toast.error(errorMessage);
@@ -436,18 +598,24 @@ const LessonManager = () => {
 
       console.log("Deleting lesson with ID:", lessonId);
 
-      const response = await axios.delete(`${API_BASE_URL}/tutor/lessons/${lessonId}`);
+      const response = await axiosInterceptor.delete(
+        `/tutor/lessons/${lessonId}`
+      );
 
       if (response.data.success) {
         toast.success("Lesson deleted successfully");
-        
+
         dispatch(deleteLesson({ courseId, lessonId }));
-        
-        setLessons(prevLessons => prevLessons.filter(lesson => lesson._id !== lessonId));
-        
+
+        setLessons((prevLessons) =>
+          prevLessons.filter((lesson) => lesson._id !== lessonId)
+        );
+
         setCourse((prevCourse) => ({
           ...prevCourse,
-          lessons: prevCourse.lessons.filter(lesson => lesson._id !== lessonId),
+          lessons: prevCourse.lessons.filter(
+            (lesson) => lesson._id !== lessonId
+          ),
         }));
       } else {
         throw new Error(response.data.message || "Failed to delete lesson");
@@ -456,7 +624,9 @@ const LessonManager = () => {
       console.error("Error deleting lesson:", error);
       let errorMessage = "Failed to delete lesson";
       if (error.response) {
-        errorMessage = error.response.data?.message || `Error ${error.response.status}: ${error.response.statusText}`;
+        errorMessage =
+          error.response.data?.message ||
+          `Error ${error.response.status}: ${error.response.statusText}`;
       } else if (error.request) {
         errorMessage = "No response from server. Please check your connection.";
       }
@@ -467,20 +637,31 @@ const LessonManager = () => {
     }
   };
 
-  const menuItems2 = [
+  const menuItem2 = [
     { icon: MdDashboard, label: "Dashboard", path: "/tutor/dashboard" },
     { icon: MdOutlinePerson, label: "Profile", path: "/tutor/tutor-profile" },
     { icon: MdLibraryBooks, label: "Courses", path: "/tutor/courses" },
     { icon: MdAttachMoney, label: "Revenues", path: "/revenues" },
-    { icon: BsCameraVideo, label: "Chat & Video", path: "/chat-video" },
-    { icon: BsClipboardCheck, label: "Quiz", path: "/quiz" },
+    { icon: BsCameraVideo, label: "Chat & Video", path: "/tutor/chat" },
+    { icon: BsClipboardCheck, label: "Quiz", path: "/tutor/quizmanage" },
+    { icon: MdReport, label: "Course Reports", path: "/tutor/courselist" },
   ];
 
-  const bgClass = theme === "dark" ? "min-h-screen bg-gray-900 text-gray-100" : "min-h-screen bg-green-50 text-gray-900";
-  const cardClass = theme === "dark" ? "bg-gray-800 shadow rounded-lg p-6 mb-8 text-gray-100 border border-gray-700" : "bg-white shadow rounded-lg p-6 mb-8";
-  const inputClass = theme === "dark" ? "block w-full pl-10 border-gray-700 p-3 rounded-md bg-gray-700 text-gray-100 focus:ring-green-500 focus:border-green-500" : "block w-full pl-10 border-green-300 p-3 rounded-md focus:ring-green-500 focus:border-green-500";
+  const bgClass =
+    theme === "dark"
+      ? "min-h-screen bg-gray-900 text-gray-100"
+      : "min-h-screen bg-green-50 text-gray-900";
+  const cardClass =
+    theme === "dark"
+      ? "bg-gray-800 shadow rounded-lg p-6 mb-8 text-gray-100 border border-gray-700"
+      : "bg-white shadow rounded-lg p-6 mb-8";
+  const inputClass =
+    theme === "dark"
+      ? "block w-full pl-10 border-gray-700 p-3 rounded-md bg-gray-700 text-gray-100 focus:ring-green-500 focus:border-green-500"
+      : "block w-full pl-10 border-green-300 p-3 rounded-md focus:ring-green-500 focus:border-green-500";
   const textColorClass = theme === "dark" ? "text-green-400" : "text-green-800";
-  const labelColorClass = theme === "dark" ? "text-green-300" : "text-green-700";
+  const labelColorClass =
+    theme === "dark" ? "text-green-300" : "text-green-700";
   const iconColorClass = theme === "dark" ? "text-green-500" : "text-green-400";
 
   return (
@@ -490,7 +671,7 @@ const LessonManager = () => {
         onClose={() => setIsOpen(false)}
         theme={theme}
         handleLogout={handleLogoutClick}
-        menuItems={menuItems2}
+        menuItems={menuItem2}
       />
       <TutorHeader
         isOpen={isOpen}
@@ -569,14 +750,14 @@ const LessonManager = () => {
                     Lesson Description
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
                       <FiFileText className={`h-5 w-5 ${iconColorClass}`} />
                     </div>
                     <textarea
                       id="description"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className={`${inputClass} h-24`}
+                      className={`${inputClass} h-24 pl-10 pt-3 resize-none`}
                       placeholder="Enter lesson description"
                       required
                     />
@@ -629,23 +810,27 @@ const LessonManager = () => {
                       </div>
                     </div>
                     {videoPreview && (
-        <div className="mt-4">
-          <video src={videoPreview} controls className="w-full h-auto rounded-md">
-            Your browser does not support the video tag.
-          </video>
-          <button
-            type="button"
-            onClick={() => {
-              setVideoPreview(null);
-              setVideoFile(null);
-              if (videoRef.current) videoRef.current.value = "";
-            }}
-            className="mt-2 text-red-500 hover:text-red-700"
-          >
-            Remove Video
-          </button>
-        </div>
-      )}
+                      <div className="mt-4">
+                        <video
+                          src={videoPreview}
+                          controls
+                          className="w-full h-auto rounded-md"
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVideoPreview(null);
+                            setVideoFile(null);
+                            if (videoRef.current) videoRef.current.value = "";
+                          }}
+                          className="mt-2 text-red-500 hover:text-red-700"
+                        >
+                          Remove Video
+                        </button>
+                      </div>
+                    )}
                     {uploadProgress > 0 && uploadProgress < 100 && (
                       <div className="mt-2">
                         <div className="bg-gray-200 rounded-full h-2.5">
@@ -812,7 +997,11 @@ const LessonManager = () => {
                 Lessons ({course?.lessons?.length || 0})
               </h2>
               {!course?.lessons || course.lessons.length === 0 ? (
-                <p className={`${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
+                <p
+                  className={`${
+                    theme === "dark" ? "text-green-400" : "text-green-600"
+                  }`}
+                >
                   No lessons added yet.
                 </p>
               ) : (
@@ -820,7 +1009,9 @@ const LessonManager = () => {
                   {course?.lessons?.map((lesson) => (
                     <li
                       key={lesson._id}
-                      className={`${theme === "dark" ? "bg-gray-700" : "bg-green-50"} rounded-lg p-4 flex justify-between items-start`}
+                      className={`${
+                        theme === "dark" ? "bg-gray-700" : "bg-green-50"
+                      } rounded-lg p-4 flex justify-between items-start`}
                     >
                       <div className="flex-grow">
                         <h3
@@ -923,6 +1114,13 @@ const LessonManager = () => {
           </div>
         </main>
       </div>
+      <CropperModal
+        isOpen={showCropper}
+        onClose={() => setShowCropper(false)}
+        image={cropperImage}
+        onCropComplete={handleCroppedImage}
+        theme={theme}
+      />
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
@@ -940,4 +1138,3 @@ const LessonManager = () => {
 };
 
 export default LessonManager;
-

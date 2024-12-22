@@ -20,7 +20,7 @@ import {
 } from "../../Redux/Slices/categorySlice";
 import { toast } from "sonner";
 import axios from "axios";
-
+import axiosInterceptor from "@/axiosInstance";
 const CategoryManager = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => {
@@ -49,6 +49,9 @@ const CategoryManager = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+const [isLoading, setIsLoading] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
   const [newCategory, setNewCategory] = useState({
     title: "",
@@ -86,9 +89,12 @@ const CategoryManager = () => {
 
   useEffect(() => {
     const fetchCategories = async () => {
+        setIsLoading(true);
         try {
-            const response = await axios.get(`${API_BASE_URL}/categories`);
-            const fetchedCategories = response.data.map((category) => ({
+            const response = await axiosInterceptor.get(`/admin/categories?page=${currentPage}&limit=5`);
+            const { categories: fetchedCategories, pagination } = response.data;
+            
+            const categoriesWithVisibility = fetchedCategories.map((category) => ({
                 ...category,
                 id: category._id || category.id,
                 _id: category._id || category.id,
@@ -97,30 +103,20 @@ const CategoryManager = () => {
                 createdDate: category.createdAt || new Date().toISOString(),
             }));
 
-            // Retrieve visibility states from local storage
-            const storedVisibilityStates = JSON.parse(
-                localStorage.getItem("categoryVisibility") || "{}"
-            );
-
-            // Merge fetched data with stored visibility states
-            const mergedCategories = fetchedCategories.map((category) => ({
-                ...category,
-                isVisible: storedVisibilityStates[category._id] !== undefined
-                    ? storedVisibilityStates[category._id]
-                    : category.isVisible,
-                visible: storedVisibilityStates[category._id] !== undefined
-                    ? storedVisibilityStates[category._id]
-                    : category.isVisible,
-            }));
-
-            dispatch(setCategories(mergedCategories));
+            // Update pagination info
+            setTotalPages(pagination.totalPages);
+            
+            // Update Redux store
+            dispatch(setCategories(categoriesWithVisibility));
         } catch (error) {
             toast.error("Failed to fetch categories");
+        } finally {
+            setIsLoading(false);
         }
     };
 
     fetchCategories();
-}, [dispatch]);
+}, [currentPage, dispatch]);
 
   const handleAddCategory = async () => {
     if (!newCategory.title || !newCategory.description) {
@@ -129,7 +125,7 @@ const CategoryManager = () => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/addcategory`, {
+      const response = await axiosInterceptor.post(`/admin/addcategory`, {
         ...newCategory,
         createdDate: new Date().toISOString(),
       });
@@ -165,8 +161,8 @@ const CategoryManager = () => {
 
       console.log("Sending update payload:", updatePayload);
 
-      const response = await axios.put(
-        `${API_BASE_URL}/categories/${currentCategory.id}`,
+      const response = await axiosInterceptor.put(
+        `/admin/categories/${currentCategory.id}`,
         updatePayload
       );
 
@@ -219,7 +215,7 @@ const CategoryManager = () => {
             return;
         }
 
-        const response = await axios.delete(`${API_BASE_URL}/categories/${categoryId}`);
+        const response = await axiosInterceptor.delete(`/admin/categories/${categoryId}`);
 
         if (response.data) {
             // Update the Redux store with the filtered categories
@@ -239,8 +235,8 @@ const CategoryManager = () => {
 
   const toggleVisibility = async (categoryId) => {
     try {
-        const response = await axios.patch(
-            `${API_BASE_URL}/categories/${categoryId}/toggle-visibility`
+        const response = await axiosInterceptor.patch(
+            `/admin/categories/${categoryId}/toggle-visibility`
         );
 
         if (response.data) {
@@ -278,6 +274,30 @@ const CategoryManager = () => {
         toast.error("Failed to update visibility");
     }
 };
+
+
+const PaginationControls = ({ currentPage, totalPages, onPageChange }) => (
+  <div className="flex justify-center items-center space-x-2 mt-4">
+      <Button
+          onClick={() => onPageChange(currentPage - 1)}
+          variant="secondary"
+          disabled={currentPage === 1}
+      >
+          Previous
+      </Button>
+      <span className={`px-4 py-2 rounded ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100'}`}>
+          Page {currentPage} of {totalPages}
+      </span>
+      <Button
+          onClick={() => onPageChange(currentPage + 1)}
+          variant="secondary"
+          disabled={currentPage === totalPages}
+      >
+          Next
+      </Button>
+  </div>
+);
+
 
   return (
     <div
@@ -360,10 +380,7 @@ const CategoryManager = () => {
                         ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
                         : "bg-gray-50 text-gray-800 hover:bg-gray-100"
                     }`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
+                    
                   >
                     <div>
                       <span className="font-bold">{category.title}</span>
@@ -434,6 +451,17 @@ const CategoryManager = () => {
                 ))}
             </AnimatePresence>
           </ul>
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+                <span className="loading">Loading...</span>
+            </div>
+        ) : (
+            <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page)}
+            />
+        )}
         </motion.div>
 
         <motion.button

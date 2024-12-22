@@ -3,7 +3,8 @@ import axios from 'axios';
 import { toast, Toaster } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';  
-import img from '../../assets/forget.webp'
+import img from '../../assets/forget.webp';
+import axiosInterceptor from '@/axiosInstance';
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/admin";
 
 const AdminResetPassword = () => {
@@ -27,7 +28,7 @@ const AdminResetPassword = () => {
     useEffect(() => {
         const verifyToken = async () => {
             try {
-                await axios.get(`${API_BASE_URL}/verify-reset-token/${token}`);
+                await axiosInterceptor.get(`/admin/verify-reset-token/${token}`);
                 setValidToken(true);
             } catch (error) {
                 setValidToken(false);
@@ -78,7 +79,7 @@ const AdminResetPassword = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/adminreset-password`, { token, newPassword });
+            const response = await axiosInterceptor.post(`/admin/adminreset-password`, { token, newPassword });
             toast.success(response.data.message);
             setTimeout(() => {
                 navigate('/admin/adminlogin');

@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { loginAdmin } from "../../Redux/Slices/adminSlice";
-
+import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/admin";
 
@@ -65,62 +65,40 @@ export default function AdminLogin() {
   };
 
   const handleSubmit = async (e) => {
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
-
-    if (!isEmailValid || !isPasswordValid) {
+    e.preventDefault();
+  
+    if (!validateEmail(email) || !validatePassword(password)) {
       toast.error("Please correct the errors before submitting");
       return;
     }
-
-    e.preventDefault();
-    const adminData = {
-      email: e.target.email.value,
-      password: e.target.password.value,
-    };
-
+  
     try {
-      const response = await axios.post(`${API_BASE_URL}/login`, adminData, {
-        withCredentials: true,
-      });
-
-      if (response.status === 200 && response.data.admin) {
-        console.log(response);
-        const adminData = {
+      const response = await axiosInterceptor.post(
+        `admin/login`,
+        { email, password },
+        { withCredentials: true }
+      );
+  
+      if (response.data.admin) {
+        dispatch(loginAdmin({
           email: response.data.admin.email,
           fullName: response.data.admin.fullName || "Admin Name",
           profileImage: response.data.admin.profileImage || "default-image.jpg",
-        };
-
-        dispatch(loginAdmin(adminData));
-
-        toast.success(response.data.message || "Admin Login successful", {
-          duration: 3000,
-        });
-
-        setTimeout(() => {
-          navigate(from);
-        }, 1000);
-      } else {
-        toast.error(response.data.message || "Invalid credentials", {
-          duration: 3000,
-        });
+        }));
+  
+        toast.success("Login successful");
+        navigate(from || "/admin/dashboard");
       }
     } catch (error) {
-      toast.error(
-        error.response?.data.message ||
-          "Something went wrong, please try again",
-        {
-          duration: 4000,
-        }
-      );
+      toast.error(error.response?.data?.message || "Invalid credentials");
     }
   };
 
+
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/admin/google`,
+      const response = await axiosInterceptor.post(
+        `/auth/admin/google`,
         { token: credentialResponse.credential },
         { withCredentials: true }
       );

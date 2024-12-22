@@ -1,8 +1,19 @@
 import { useState, useEffect } from 'react'
 import { User, Phone, Mail, Upload, Save, CheckCircle, Edit } from 'lucide-react'
 import { useSelector, useDispatch } from "react-redux"
-import { MdOutlinePerson, MdLibraryBooks, MdOutlineShoppingCart, MdOutlineFavoriteBorder, MdOutlineHome } from "react-icons/md"
-import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs"
+import {
+  MdOutlinePerson,
+  MdLibraryBooks,
+  MdOutlineShoppingCart,
+  MdOutlineFavoriteBorder,
+  MdOutlineHome,
+  MdOutlineReceiptLong,
+  MdAccountBalanceWallet
+} from "react-icons/md";
+import { 
+  BsPeopleFill,
+  BsFillAwardFill,
+} from "react-icons/bs";
 import Header from './Common/Header'
 import Footer from './Common/Footer'
 import Sidebar from '../../ui/sideBar'
@@ -13,11 +24,24 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import OtpModal from '@/ui/OTP'
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+import axiosInterceptor from '@/axiosInstance'
 
-const axiosInstance= axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-});
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Phone validation for exactly 10 digits
+const validatePhone = (phone) => {
+  // Remove all non-numeric characters
+  const cleanedPhone = phone.replace(/\D/g, '');
+  
+  // Check if it's exactly 10 digits
+  return cleanedPhone.length === 10 && /^\d{10}$/.test(cleanedPhone);
+};
+const validateName = (name) => {
+  return name.length >= 2 && name.length <= 50;
+};
 
 export default function Profile() {
   const [formData, setFormData] = useState({
@@ -69,9 +93,31 @@ export default function Profile() {
       return;
     }
 
+
+    let isValid = true;
+    if (editField === 'email') {
+      isValid = validateEmail(editValue);
+      if (!isValid) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
+    } else if (editField === 'phone') {
+      isValid = validatePhone(editValue);
+      if (!isValid) {
+        toast.error("Please enter a valid phone number");
+        return;
+      }
+    } else if (editField === 'name') {
+      isValid = validateName(editValue);
+      if (!isValid) {
+        toast.error("Name should be between 2 and 50 characters");
+        return;
+      }
+    }
+
     if (editField === 'email') {
       try {
-        const response = await axiosInstance.post("/send-otp", {
+        const response = await axiosInterceptor.post("/user/send-otp", {
           email: editValue.trim()
         });
 
@@ -103,7 +149,7 @@ export default function Profile() {
         [apiField]: editValue.trim()
       };
 
-      const response = await axiosInstance.put("/update", updatedData);
+      const response = await axiosInterceptor.put("/user/update", updatedData);
 
       setFormData(prev => ({
         ...prev,
@@ -138,14 +184,14 @@ export default function Profile() {
   
     try {
       // First, verify the OTP
-      const verifyResponse = await axiosInstance.post("/verify-otp", {
+      const verifyResponse = await axiosInterceptor.post("/user/verify-otp", {
         email: pendingEmailUpdate,
         otp: otpValue
       });
   
       if (verifyResponse.data.message === "OTP verified successfully") {
         // If OTP is verified, proceed with email update
-        const updateResponse = await axiosInstance.put("/update", {
+        const updateResponse = await axiosInterceptor.put("/user/update", {
           _id: userData.id,
           email: pendingEmailUpdate
         });
@@ -213,7 +259,7 @@ export default function Profile() {
       if (data.secure_url) {
         const updatedUser = { ...userData, _id: userData._id, profileImage: data.secure_url };
   
-        const updateResponse = await axiosInstance.put("/update", updatedUser);
+        const updateResponse = await axiosInterceptor.put("/user/update", updatedUser);
   
         dispatch(updateUser(updatedUser));
         setPreviewImage(data.secure_url);
@@ -249,11 +295,13 @@ export default function Profile() {
   const menuItems = [
     { icon: MdOutlineHome, label: "Home", path: "/user/home" },
     { icon: MdOutlinePerson, label: "Profile", path: "/user/profile" },
-    { icon: MdLibraryBooks, label: "My Courses", path: "/my-courses" },
-    { icon: BsPeopleFill, label: "Teachers", path: "/teachers" },
-    { icon: MdOutlineShoppingCart, label: "My Orders", path: "/my-orders" },
-    { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/wishlist" },
-    { icon: BsFillAwardFill, label: "Certificates", path: "/certificates" },
+    { icon: MdLibraryBooks, label: "My Courses", path: "/user/my-courses" },
+    { icon: BsPeopleFill, label: "Teachers", path: "/user/mytutors" },
+    { icon: MdOutlineShoppingCart, label: "My Orders", path: "/user/payments/status" },
+    { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/user/wishlist" },
+    { icon: BsFillAwardFill, label: "Certificates", path: "/user/certificates" },
+    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
+    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
   ]
 
   return (

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';  
 import img from '../../assets/forget.webp'
+import axiosInterceptor from '@/axiosInstance';
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/user";
 
 const ResetPassword = () => {
@@ -78,7 +79,7 @@ const ResetPassword = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/reset-password`, { token, newPassword });
+            const response = await axiosInterceptor.post(`/user/reset-password`, { token, newPassword });
             toast.success(response.data.message);
             setTimeout(() => {
                 navigate('/user/login');
@@ -120,7 +121,7 @@ const ResetPassword = () => {
 
     return (
      <div className="min-h-screen flex justify-center items-center bg-gray-100">
-            <Toaster position="top-left" richColors />
+            
             <div className="flex w-full max-w-4xl mx-4 bg-white rounded-lg shadow-md overflow-hidden">
                 {/* Left side image */}
                 <div className="hidden md:block w-1/2 bg-green-50">

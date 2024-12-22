@@ -9,61 +9,131 @@ import Tutors from '@/Pages/ADMIN/Tutors';
 import ProtectAdminRoute from '@/Component/ProtectAdminRoute';
 import CategoryManager from '@/Pages/ADMIN/CategoryManagement';
 import Courses from '@/Pages/ADMIN/CourseManagement';
+import AdminReportedCourses from '@/Pages/ADMIN/AdminReportedCourses';
+import PaymentStatus from '@/Pages/ADMIN/PaymentStatus';
+import AdminRefunds from '@/Pages/ADMIN/AdminRefunds';
+import AdminCourseDetails from '@/Pages/ADMIN/AdminViewCourseDetials';
 function AdminRoute() {
   const adminDatas = useSelector((state) => state.admin.adminDatas);
 
+  const PublicRoute = ({ children }) => {
+    return adminDatas ? <Navigate to="/admin/dashboard" replace /> : children;
+  };
+
   return (
-    <div>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="adminlogin" element={<AdminLogin />} />
-        <Route path="admin-forgetpassword" element={<AdminForgetPassword />} />
-        <Route path="adminreset-password/:token" element={<AdminResetPassword />} />
+    <Routes>
+      {/* Public Routes */}
+      <Route 
+        path="adminlogin" 
+        element={
+          <PublicRoute>
+            <AdminLogin />
+          </PublicRoute>
+        } 
+      />
+      <Route 
+        path="admin-forgetpassword" 
+        element={
+          <PublicRoute>
+            <AdminForgetPassword />
+          </PublicRoute>
+        } 
+      />
+      <Route 
+        path="adminreset-password/:token" 
+        element={
+          <PublicRoute>
+            <AdminResetPassword />
+          </PublicRoute>
+        } 
+      />
 
-        {/* Protected Routes */}
-        <Route
-          path="dashboard"
-          element={
-            adminDatas ? (
-              <ProtectAdminRoute>
-                <Dashboard />
-              </ProtectAdminRoute>
-            ) : (
-              <Navigate to="/admin/adminlogin" replace />
-            )
-          }
-        />
-        <Route
-          path="students"
-          element={
-            adminDatas ? (
-              <ProtectAdminRoute>
-                <Students />
-              </ProtectAdminRoute>
-            ) : (
-              <Navigate to="/admin/adminlogin" replace />
-            )
-          }
-        />
-        <Route
-          path="tutors"
-          element={
-            adminDatas ? (
-              <ProtectAdminRoute>
-                <Tutors />
-              </ProtectAdminRoute>
-            ) : (
-              <Navigate to="/admin/adminlogin" replace />
-            )
-          }
-        />
+      {/* Protected Routes */}
+      <Route
+        path="dashboard"
+        element={
+          <ProtectAdminRoute>
+            <Dashboard />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="students"
+        element={
+          <ProtectAdminRoute>
+            <Students />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="tutors"
+        element={
+          <ProtectAdminRoute>
+            <Tutors />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="category"
+        element={
+          <ProtectAdminRoute>
+            <CategoryManager />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="courses"
+        element={
+          <ProtectAdminRoute>
+            <Courses />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="reportedcourses"
+        element={
+          <ProtectAdminRoute>
+            <AdminReportedCourses />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="refund"
+        element={
+          <ProtectAdminRoute>
+            <AdminRefunds />
+          </ProtectAdminRoute>
+        }
+      />
+      
+      <Route
+        path="payments"
+        element={
+          <ProtectAdminRoute>
+            <PaymentStatus />
+          </ProtectAdminRoute>
+        }
+      />
+      <Route
+        path="courses/:courseId"
+        element={
+          <ProtectAdminRoute>
+            <AdminCourseDetails />
+          </ProtectAdminRoute>
+        }
+      />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path='category' element={<CategoryManager />}/>
-        <Route path='courses' element={<Courses />}/>
-      </Routes>
-    </div>
+      {/* Default Routes */}
+      <Route 
+        path="" 
+        element={
+          adminDatas ? <Navigate to="dashboard" replace /> : <Navigate to="adminlogin" replace />
+        } 
+      />
+      <Route path="*" element={<Navigate to={adminDatas ? "dashboard" : "adminlogin"} replace />} />
+    </Routes>
   );
 }
 
 export default AdminRoute;
+

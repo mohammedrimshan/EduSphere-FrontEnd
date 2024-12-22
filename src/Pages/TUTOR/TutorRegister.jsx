@@ -12,7 +12,7 @@ import DotDotDotSpinner from "../../ui/Spinner/DotDotDotSpinner";
 import { loginTutor } from "../../Redux/Slices/tutorSlice";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/tutor";
-
+import axiosInterceptor from "@/axiosInstance";
 export default function TutorRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -122,7 +122,7 @@ export default function TutorRegister() {
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${API_BASE_URL}/send-otp`, {
+      const response = await axiosInterceptor.post(`/tutor/send-otp`, {
         email: formData.email,
       });
       if (response.data.message === "OTP sent successfully") {
@@ -142,13 +142,13 @@ export default function TutorRegister() {
   const handleVerify = async (otp) => {
     try {
       setIsSubmitting(true);
-      const verifyResponse = await axios.post(`${API_BASE_URL}/verify-otp`, {
+      const verifyResponse = await axiosInterceptor.post(`/tutor/verify-otp`, {
         email: formData.email,
         otp: otp,
       });
 
       if (verifyResponse.data.message === "OTP verified successfully") {
-        const registerResponse = await axios.post(`${API_BASE_URL}/signup`, {
+        const registerResponse = await axiosInterceptor.post(`/tutor/signup`, {
           full_name: formData.full_name,
           email: formData.email,
           phone: formData.phone,

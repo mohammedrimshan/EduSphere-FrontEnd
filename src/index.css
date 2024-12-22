@@ -11,3 +11,10 @@
 .dark {
   --tw-bg-opacity: 1;
 }
+
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+} 

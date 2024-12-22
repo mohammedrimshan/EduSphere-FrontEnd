@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff,AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, AlertTriangle } from "lucide-react";
 import TutorLoginBanner from "../../assets/TutorLogin.jpg";
 import Goolge from "../../assets/Google.png";
 import { GoogleLogin } from "@react-oauth/google";
@@ -8,16 +8,16 @@ import { useDispatch } from "react-redux";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { loginTutor } from "../../Redux/Slices/tutorSlice";
-
+import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/tutor";
 
 export default function TutorLogin() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -25,13 +25,13 @@ export default function TutorLogin() {
   const validateEmail = (inputEmail) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!inputEmail) {
-      setEmailError('Email is required');
+      setEmailError("Email is required");
       return false;
     } else if (!emailRegex.test(inputEmail)) {
-      setEmailError('Invalid email format');
+      setEmailError("Invalid email format");
       return false;
     } else {
-      setEmailError('');
+      setEmailError("");
       return true;
     }
   };
@@ -39,17 +39,16 @@ export default function TutorLogin() {
   // Password validation function
   const validatePassword = (inputPassword) => {
     if (!inputPassword) {
-      setPasswordError('Password is required');
+      setPasswordError("Password is required");
       return false;
     } else if (inputPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+      setPasswordError("Password must be at least 6 characters");
       return false;
     } else {
-      setPasswordError('');
+      setPasswordError("");
       return true;
     }
   };
-
 
   const handleEmailChange = (e) => {
     const inputEmail = e.target.value;
@@ -67,36 +66,67 @@ export default function TutorLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate email and password
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
 
     if (!isEmailValid || !isPasswordValid) {
-      toast.error('Please correct the errors before submitting');
+      toast.error("Please correct the errors before submitting");
       return;
     }
 
-
+    // Prepare tutor data
     const tutorData = {
       email: e.target.email.value,
       password: e.target.password.value,
     };
 
     try {
+      // Make API call to log in the tutor
       const response = await axios.post(`${API_BASE_URL}/login`, tutorData, {
         withCredentials: true,
       });
 
       console.log("Response:", response);
-      if (response.status === 200 && response.data.tutor) {
+
+      // If login is successful
+      if (response.status === 200 && response.data.accessToken) {
+        const { tutor } = response.data;
         dispatch(loginTutor(response.data.tutor));
+        localStorage.setItem("userType", "tutor");
+
+        // Dispatch to Redux if necessary
+        if (tutor) {
+          dispatch(
+            loginTutor({
+              id: tutor.id,
+              full_name: tutor.full_name,
+              email: tutor.email,
+              phone: tutor.phone,
+              tutor_id: tutor.id,
+              profile_image: tutor.profile_image,
+              status: tutor.status,
+              courses: tutor.courses,
+              is_verified: tutor.is_verified,
+              lastActive: tutor.lastActive,
+              lastLogin: tutor.lastLogin,
+            })
+          );
+        }
+
+        // Display success message
         toast.success(response.data.message || "Login successful");
-        setTimeout(() => navigate("/tutor/tutorhome"), 1000);
+
+        // Redirect to tutor dashboard
+        navigate("/tutor/dashboard");
       } else {
+        // Handle invalid credentials or other response issues
         toast.error(response.data.message || "Invalid credentials");
       }
     } catch (error) {
       console.error("Error:", error);
 
+      // Handle errors
       if (error.response && error.response.data.message) {
         toast.error(error.response.data.message);
       } else {
@@ -206,68 +236,68 @@ export default function TutorLogin() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Tutorname Input */}
             <div>
-            <label 
-            htmlFor="username" 
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Tutor name
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="email"
-            value={email}
-            onChange={handleEmailChange}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              emailError 
-                ? 'border-red-500 focus:ring-red-500' 
-                : 'border-gray-200 focus:ring-green-500'
-            } focus:outline-none focus:ring-2 focus:border-green-500 transition-all duration-300`}
-            placeholder="Enter your User name"
-            required
-          />
-          {emailError && (
-            <div className="flex items-center text-red-500 text-sm mt-1">
-              <AlertTriangle size={16} className="mr-2" />
-              {emailError}
-            </div>
-          )}
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Tutor name
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="email"
+                value={email}
+                onChange={handleEmailChange}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  emailError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-200 focus:ring-green-500"
+                } focus:outline-none focus:ring-2 focus:border-green-500 transition-all duration-300`}
+                placeholder="Enter your User name"
+                required
+              />
+              {emailError && (
+                <div className="flex items-center text-red-500 text-sm mt-1">
+                  <AlertTriangle size={16} className="mr-2" />
+                  {emailError}
+                </div>
+              )}
             </div>
             {/* Password Input with Toggle */}
             <div className="relative">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Password
-          </label>
-          <input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            name="password"
-            value={password}
-            onChange={handlePasswordChange}
-            className={`w-full px-4 py-3 rounded-lg border ${
-              passwordError 
-                ? 'border-red-500 focus:ring-red-500' 
-                : 'border-gray-200 focus:ring-green-500'
-            } focus:outline-none focus:ring-2 focus:border-green-500 transition-all duration-300`}
-            placeholder="Enter your Password"
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors duration-300"
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-          {passwordError && (
-            <div className="flex items-center text-red-500 text-sm mt-1">
-              <AlertTriangle size={16} className="mr-2" />
-              {passwordError}
-            </div>
-          )}
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={password}
+                onChange={handlePasswordChange}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  passwordError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-200 focus:ring-green-500"
+                } focus:outline-none focus:ring-2 focus:border-green-500 transition-all duration-300`}
+                placeholder="Enter your Password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors duration-300"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+              {passwordError && (
+                <div className="flex items-center text-red-500 text-sm mt-1">
+                  <AlertTriangle size={16} className="mr-2" />
+                  {passwordError}
+                </div>
+              )}
             </div>
             {/* Remember Me and Forgot Password */}
             <div className="flex items-center justify-between">

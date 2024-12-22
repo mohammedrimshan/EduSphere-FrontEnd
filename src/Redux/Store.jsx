@@ -9,6 +9,17 @@ import adminReducer from './Slices/adminSlice'
 import categoryReducer from './Slices/categorySlice'
 import courseReducer from './Slices/courseSlice';
 import cartReducer from './Slices/cartSlice';
+import persistedQuizReducer from './Slices/quizSlice'
+
+
+const userPersistConfig = {
+  key: 'user',
+  storage,
+  whitelist: ['userDatas']
+};
+
+const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
+
 
 const persistConfig = {
   key: 'root',
@@ -20,7 +31,7 @@ const persistedCartReducer = persistReducer(persistConfig, cartReducer);
 
 const store = configureStore({
   reducer: {
-    user: userReducer,
+    user: persistedUserReducer,
     theme: themeReducer,
     tutor: tutorReducer,
     sidebar: sidebarReducer,
@@ -28,6 +39,7 @@ const store = configureStore({
     category: categoryReducer,
     course: courseReducer,
     cart: persistedCartReducer,
+    quizzes: persistedQuizReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
