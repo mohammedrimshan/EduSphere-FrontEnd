@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Bell } from "lucide-react";
 import Button from "../../../ui/Button";
 import ThemeToggle from "../../../ui/themeToggle";
 import { toggleTheme } from "../../../Redux/Slices/themeSlice";
@@ -10,37 +11,70 @@ export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme.theme);
   const tutor = useSelector((state) => state.tutor.tutorData);
-  console.log("Header Data", tutor);
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const eventSourceRef = useRef(null);
+
+  const setupNotifications = useCallback(() => {
+    if (!tutor) return;
+
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const eventSource = new EventSource(
+      `http://localhost:5000/tutor/notifications/stream`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    eventSource.onopen = () => {
+      console.log("SSE connection opened");
+    };
+
+    eventSource.addEventListener("notification", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "NOTIFICATION_UPDATE") {
+          setNotificationCount(data.unreadCount);
+        }
+      } catch (error) {
+        console.error("Error parsing notification data:", error);
+      }
+    });
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "NOTIFICATION_UPDATE") {
+          setNotificationCount(data.unreadCount);
+        }
+      } catch (error) {
+        console.error("Error parsing message data:", error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE connection error:", error);
+      eventSource.close();
+      setTimeout(() => setupNotifications(), 5000);
+    };
+
+    eventSourceRef.current = eventSource;
+
+    return () => {
+      eventSource.close();
+    };
+  }, [tutor]);
+
+  useEffect(() => {
+    if (tutor) {
+      return setupNotifications();
+    }
+  }, [tutor, setupNotifications]);
 
   return (
     <header className="border-b dark:border-gray-700 bg-white dark:bg-gray-900">
-      {/* Mobile Search Overlay */}
-      {showMobileSearch && (
-        <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 p-4 md:hidden">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                <Search className="h-5 w-5" />
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowMobileSearch(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Main Header Content */}
       <div className="container mx-auto flex h-16 items-center px-4 justify-between">
         {/* Left Section: Menu and Logo */}
         <div className="flex items-center gap-4">
@@ -62,30 +96,23 @@ export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
           </a>
         </div>
 
-        {/* Desktop Search Box */}
-        <div className="hidden md:flex relative flex-1 max-w-lg mx-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
-            <Search className="h-5 w-5" />
-          </span>
-        </div>
-
-        {/* Right Section: Search Toggle, Profile, and Theme */}
+        {/* Right Section: Notifications, Profile, and Theme */}
         <div className="flex items-center gap-4">
-          {/* Mobile Search Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setShowMobileSearch(true)}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
+          <Link to="/tutor/tutornotification">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <Bell className="h-5 w-5" />
+              {notificationCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {notificationCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+          
           <img
             src={tutor.profile_image || tutor.profileImage || avatar}
             alt="Profile"

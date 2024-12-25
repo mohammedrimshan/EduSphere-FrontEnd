@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Bell, BellOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const NotificationsPage = () => {
+const TutorNotificationsPage = () => {
   const theme = useSelector((state) => state.theme.theme);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ const NotificationsPage = () => {
   const fetchNotifications = async (pageNum = 1) => {
     try {
       const response = await axiosInterceptor.get(
-        `/user/notifications?page=${pageNum}&limit=10`
+        `/tutor/notifications?page=${pageNum}&limit=10`
       );
       const newNotifications = response.data;
 
@@ -32,7 +32,7 @@ const NotificationsPage = () => {
       // Mark notifications as read
       await Promise.all(
         newNotifications.map((notification) =>
-          axiosInterceptor.put(`/user/notifications/${notification._id}/read`)
+          axiosInterceptor.put(`/tutor/notifications/${notification._id}/read`)
         )
       );
     } catch (error) {
@@ -191,4 +191,4 @@ const NotificationsPage = () => {
   );
 };
 
-export default NotificationsPage;
+export default TutorNotificationsPage;

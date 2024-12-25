@@ -8,9 +8,9 @@ import {
   FaLinkedin,
   FaFacebook,
   FaSpinner,
-  FaExclamationCircle
+  FaExclamationCircle,
 } from "react-icons/fa";
-import { toast, Toaster } from 'sonner';
+import { toast, Toaster } from "sonner";
 import Reset from "../../assets/Reset.jpg";
 import axiosInterceptor from "@/axiosInstance";
 // Modal Component
@@ -43,7 +43,7 @@ const ForgetPassword = () => {
   // Email validation function
   const validateEmail = (inputEmail) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+
     if (!inputEmail) {
       setEmailError("Email is required");
       return false;
@@ -66,7 +66,7 @@ const ForgetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isEmailValid = validateEmail(email);
-    
+
     if (!isEmailValid) {
       toast.error("Please correct the email error");
       return;
@@ -88,7 +88,7 @@ const ForgetPassword = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-     <Toaster position="top-left" richColors />
+      <Toaster position="top-left" richColors />
       <div className="flex flex-1 lg:flex-row flex-col">
         <div className="hidden lg:flex lg:w-1/2 bg-gray-100 relative">
           <img
@@ -131,9 +131,9 @@ const ForgetPassword = () => {
                       placeholder="Enter your E-mail"
                       required
                       className={`w-full px-3 py-2 border ${
-                        emailError 
-                          ? 'border-red-500 focus:ring-red-500' 
-                          : 'border-gray-300 focus:ring-green-500'
+                        emailError
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-green-500"
                       } rounded-md shadow-sm focus:outline-none focus:border-green-500`}
                     />
                     {emailError && (
@@ -148,7 +148,6 @@ const ForgetPassword = () => {
                     </p>
                   )}
                 </div>
-
 
                 <button
                   type="submit"
@@ -182,7 +181,9 @@ const ForgetPassword = () => {
 
       {/* Modal for Reset Confirmation */}
       <Modal open={resetSent} onClose={() => setResetSent(false)}>
-        <h2 className="text-2xl font-bold mb-4 text-center">Check Your Email</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Check Your Email
+        </h2>
         <p className="text-gray-600 text-center">
           We've sent a password reset link to your email. Please check your
           inbox and follow the instructions to reset your password.

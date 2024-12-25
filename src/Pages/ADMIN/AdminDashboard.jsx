@@ -165,7 +165,7 @@ export default function Dashboard() {
   const stats = [
     { 
       label: 'Total Revenue', 
-      value: `$${dashboardData.stats.totalRevenue.toLocaleString()}`,
+      value: `₹${dashboardData.stats.totalRevenue.toLocaleString()}`,
       icon: FaDollarSign 
     },
     { 
@@ -286,7 +286,7 @@ export default function Dashboard() {
           {/* Header Actions */}
           <div className="flex items-center gap-4 w-full sm:w-auto">
             {/* Search */}
-            <div className="relative flex-1 sm:flex-none">
+            {/* <div className="relative flex-1 sm:flex-none">
               <input
                 type="search"
                 placeholder="Search..."
@@ -297,7 +297,7 @@ export default function Dashboard() {
                 } focus:outline-none focus:ring-1 focus:ring-green-500`}
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
+            </div> */}
 
             {/* Theme Toggle */}
             <button

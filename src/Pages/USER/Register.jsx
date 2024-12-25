@@ -178,14 +178,14 @@ export default function Register() {
         });
 
         if (registerResponse.data.message === "User registered successfully") {
-          const userData ={
+          const userData = {
             ...registerResponse.data.user,
-            phone:formData.phone
-          }
+            phone: formData.phone,
+          };
           dispatch(loginUser(userData));
-          
-          if(registerResponse.data.user){
-            localStorage.setItem("token",registerResponse.data.token)
+
+          if (registerResponse.data.user) {
+            localStorage.setItem("token", registerResponse.data.token);
           }
 
           toast.success("Registration successful!");

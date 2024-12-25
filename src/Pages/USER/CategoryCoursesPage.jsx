@@ -10,7 +10,7 @@ import {
   MdFavoriteBorder,
   MdFavorite,
   MdOutlineHome,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
 import axiosInterceptor from "@/axiosInstance";
 import { toast } from "sonner";
@@ -219,8 +219,12 @@ const CategoryCoursesPage = () => {
       label: "Certificates",
       path: "/user/certificates",
     },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   const renderFilterSection = () => (

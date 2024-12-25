@@ -12,7 +12,19 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Star, BookOpen, DollarSign, Users, Plus, Edit, Eye, Calendar, Home, Info, Phone } from 'lucide-react';
+import {
+  Star,
+  BookOpen,
+  DollarSign,
+  Users,
+  Plus,
+  Edit,
+  Eye,
+  Calendar,
+  Home,
+  Info,
+  Phone,
+} from "lucide-react";
 import {
   MdDashboard,
   MdOutlinePerson,
@@ -50,7 +62,8 @@ const TutorHome = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
-
+  const courses = useSelector((state) => state.course.courseDatas);
+  console.log(courses);
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -83,6 +96,9 @@ const TutorHome = () => {
     navigate("/tutor/createcourse");
   };
 
+  const handleViewCourse = (courseId) => {
+    navigate(`/tutor/coursepreview/${courseId}`);
+  };
   const menuItem2 = [
     { icon: MdDashboard, label: "Dashboard", path: "/tutor/dashboard" },
     { icon: MdOutlinePerson, label: "Profile", path: "/tutor/tutor-profile" },
@@ -266,16 +282,15 @@ const TutorHome = () => {
           </div>
 
           <div className="grid gap-6 mb-8 md:grid-cols-2">
-            
-              <div
-                className={`p-6 rounded-lg shadow-md ${
-                  theme === "dark"
-                    ? "bg-gray-800 border-green-700"
-                    : "bg-white border-green-200"
-                } border`}
-              >
-                <RevenueOverview revenueData={revenueData} theme={theme} />
-              </div>
+            <div
+              className={`p-6 rounded-lg shadow-md ${
+                theme === "dark"
+                  ? "bg-gray-800 border-green-700"
+                  : "bg-white border-green-200"
+              } border`}
+            >
+              <RevenueOverview revenueData={revenueData} theme={theme} />
+            </div>
             <div
               className={`p-6 rounded-lg shadow-md ${
                 theme === "dark"
@@ -336,6 +351,7 @@ const TutorHome = () => {
                       {course.students} students enrolled
                     </div>
                     <button
+                      onClick={() => handleViewCourse(course._id)}
                       className={`mt-4 w-full px-4 py-2 rounded-md ${
                         theme === "dark"
                           ? "bg-green-700 hover:bg-green-600"
@@ -404,4 +420,3 @@ const TutorHome = () => {
 };
 
 export default TutorHome;
-

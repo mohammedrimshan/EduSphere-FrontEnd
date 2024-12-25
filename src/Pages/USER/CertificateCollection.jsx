@@ -17,7 +17,7 @@ import {
   MdOutlineShoppingCart,
   MdOutlineFavoriteBorder,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
 import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 import CertificateModal from "@/ui/CertificateModal";
@@ -34,8 +34,12 @@ const menuItems = [
   },
   { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/user/wishlist" },
   { icon: BsFillAwardFill, label: "Certificates", path: "/user/certificates" },
-  { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-  { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+  {
+    icon: MdOutlineReceiptLong,
+    label: "Refund History",
+    path: "/user/refund-history",
+  },
+  { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
 ];
 
 const CertificateCollection = () => {

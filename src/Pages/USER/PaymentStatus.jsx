@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Calendar, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Search, Calendar, ChevronDown } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,14 +9,11 @@ import {
   MdOutlineFavoriteBorder,
   MdOutlineHome,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
-import { 
-  BsPeopleFill,
-  BsFillAwardFill,
-} from "react-icons/bs";
-import axiosInterceptor from '@/axiosInstance';
-import { useAuth } from '@/Context/AuthContext';
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
+import axiosInterceptor from "@/axiosInstance";
+import { useAuth } from "@/Context/AuthContext";
 import Sidebar from "../../ui/sideBar";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
@@ -29,19 +26,19 @@ const PaymentStatus = () => {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme.theme);
   const { user } = useAuth();
-  console.log(user)
+  console.log(user);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [status, setStatus] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [status, setStatus] = useState("");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    total: 0
+    total: 0,
   });
 
   const menuItems = [
@@ -49,11 +46,27 @@ const PaymentStatus = () => {
     { icon: MdOutlinePerson, label: "Profile", path: "/user/profile" },
     { icon: MdLibraryBooks, label: "My Courses", path: "/user/my-courses" },
     { icon: BsPeopleFill, label: "Teachers", path: "/user/mytutors" },
-    { icon: MdOutlineShoppingCart, label: "My Orders", path: "/user/payments/status" },
-    { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/user/wishlist" },
-    { icon: BsFillAwardFill, label: "Certificates", path: "/user/certificates" },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineShoppingCart,
+      label: "My Orders",
+      path: "/user/payments/status",
+    },
+    {
+      icon: MdOutlineFavoriteBorder,
+      label: "Wishlist",
+      path: "/user/wishlist",
+    },
+    {
+      icon: BsFillAwardFill,
+      label: "Certificates",
+      path: "/user/certificates",
+    },
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   const handleLogoutConfirm = () => {
@@ -78,15 +91,17 @@ const PaymentStatus = () => {
       setLoading(true);
       const queryParams = new URLSearchParams({
         page: pagination.currentPage.toString(),
-        limit: '10',
+        limit: "10",
         search: searchTerm,
         startDate: dateRange.start,
         endDate: dateRange.end,
         status,
-        userId: user.id
+        userId: user.id,
       });
-  console.log(queryParams)
-      const response = await axiosInterceptor(`/user/payments/status?${queryParams}`);
+      console.log(queryParams);
+      const response = await axiosInterceptor(
+        `/user/payments/status?${queryParams}`
+      );
       const data = response.data ? response.data : response;
       console.log(data);
 
@@ -95,11 +110,11 @@ const PaymentStatus = () => {
         setPagination({
           currentPage: data.pagination.currentPage,
           totalPages: data.pagination.pages,
-          total: data.pagination.total
+          total: data.pagination.total,
         });
       }
     } catch (error) {
-      console.error('Error fetching payments:', error);
+      console.error("Error fetching payments:", error);
     } finally {
       setLoading(false);
     }
@@ -112,11 +127,11 @@ const PaymentStatus = () => {
   const getStatusBadgeClass = (status) => {
     const baseClasses = "px-2 py-1 rounded-full text-sm font-medium";
     switch (status.toLowerCase()) {
-      case 'completed':
+      case "completed":
         return `${baseClasses} bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100`;
-      case 'in-progress':
+      case "in-progress":
         return `${baseClasses} bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100`;
-      case 'rejected':
+      case "rejected":
         return `${baseClasses} bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100`;
@@ -124,10 +139,10 @@ const PaymentStatus = () => {
   };
 
   const statusOptions = [
-    { value: '', label: 'All Status' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'in-progress', label: 'In Progress' },
-    { value: 'rejected', label: 'Rejected' },
+    { value: "", label: "All Status" },
+    { value: "completed", label: "Completed" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "rejected", label: "Rejected" },
   ];
 
   // If user is null, show loading or redirect
@@ -162,20 +177,23 @@ const PaymentStatus = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Toaster position="top-left" richColors />
-        
+
         <Header
           isOpen={isOpen}
           setIsOpen={setIsOpen}
           handleLogoutClick={handleLogoutClick}
         />
-        
+
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-auto p-6 space-y-6 bg-white dark:bg-gray-900">
           <h1 className="text-2xl font-bold dark:text-white">Payment Status</h1>
           {/* Filters Section */}
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder="Search Order ID"
@@ -192,14 +210,18 @@ const PaymentStatus = () => {
                   type="date"
                   className="border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   value={dateRange.start}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                  onChange={(e) =>
+                    setDateRange((prev) => ({ ...prev, start: e.target.value }))
+                  }
                 />
                 <span className="dark:text-white">to</span>
                 <input
                   type="date"
                   className="border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   value={dateRange.end}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                  onChange={(e) =>
+                    setDateRange((prev) => ({ ...prev, end: e.target.value }))
+                  }
                 />
               </div>
 
@@ -209,7 +231,10 @@ const PaymentStatus = () => {
                   onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                 >
                   <span className="block truncate">
-                    {status ? statusOptions.find(option => option.value === status)?.label : 'Filter by status'}
+                    {status
+                      ? statusOptions.find((option) => option.value === status)
+                          ?.label
+                      : "Filter by status"}
                   </span>
                   <ChevronDown className="w-5 h-5 ml-2 -mr-1" />
                 </button>
@@ -238,33 +263,57 @@ const PaymentStatus = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ORDER_ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ORDER AMOUNT</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">PHONE</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    ORDER_ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    ORDER AMOUNT
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    PHONE
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-center dark:text-white">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 whitespace-nowrap text-center dark:text-white"
+                    >
                       Loading...
                     </td>
                   </tr>
                 ) : payments.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 whitespace-nowrap text-center dark:text-white">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 whitespace-nowrap text-center dark:text-white"
+                    >
                       No payments found
                     </td>
                   </tr>
                 ) : (
                   payments.map((payment) => (
                     <tr key={payment.ORDER_ID}>
-                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">{payment.ORDER_ID}</td>
-                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">₹{payment.ORDER_AMOUNT.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">{payment.PHONE}</td>
-                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">{new Date(payment.Date).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">
+                        {payment.ORDER_ID}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">
+                        ₹{payment.ORDER_AMOUNT.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">
+                        {payment.PHONE}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap dark:text-white">
+                        {new Date(payment.Date).toLocaleDateString()}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={getStatusBadgeClass(payment.Status)}>
                           {payment.Status}
@@ -285,14 +334,24 @@ const PaymentStatus = () => {
                 <button
                   className="px-3 py-1 border rounded-lg disabled:opacity-50 dark:border-gray-700 dark:text-white"
                   disabled={pagination.currentPage === 1}
-                  onClick={() => setPagination(prev => ({ ...prev, currentPage: prev.currentPage - 1 }))}
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      currentPage: prev.currentPage - 1,
+                    }))
+                  }
                 >
                   Previous
                 </button>
                 <button
                   className="px-3 py-1 border rounded-lg disabled:opacity-50 dark:border-gray-700 dark:text-white"
                   disabled={pagination.currentPage === pagination.totalPages}
-                  onClick={() => setPagination(prev => ({ ...prev, currentPage: prev.currentPage + 1 }))}
+                  onClick={() =>
+                    setPagination((prev) => ({
+                      ...prev,
+                      currentPage: prev.currentPage + 1,
+                    }))
+                  }
                 >
                   Next
                 </button>
@@ -300,7 +359,7 @@ const PaymentStatus = () => {
             </div>
           </div>
         </div>
-        
+
         <Footer />
       </div>
 

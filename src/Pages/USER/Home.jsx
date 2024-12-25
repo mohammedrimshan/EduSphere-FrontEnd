@@ -292,7 +292,9 @@ export default function UserHomePage() {
                         )}
                       </button>
                       <div className="p-4">
-                        <h3 className="font-medium mb-2  dark:text-white">{course.title}</h3>
+                        <h3 className="font-medium mb-2  dark:text-white">
+                          {course.title}
+                        </h3>
                         <div className="flex items-center gap-2 mb-2">
                           <img
                             src={

@@ -30,7 +30,7 @@ import {
   MdSportsBasketball,
   MdOutlineHome,
   MdAccountBalanceWallet,
-  MdOutlineReceiptLong
+  MdOutlineReceiptLong,
 } from "react-icons/md";
 import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 import { toast, Toaster } from "sonner";
@@ -254,8 +254,12 @@ const CoursePage = () => {
       label: "Certificates",
       path: "/user/certificates",
     },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   const toggleFavorite = async (courseId) => {

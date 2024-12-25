@@ -18,6 +18,7 @@ import TutorCourseReports from '@/Pages/TUTOR/TutorCourseReport';
 import TutorCourseList from '@/Pages/TUTOR/Common/CourseList';
 import TutorChatPage from '@/Pages/TUTOR/TutorChatPage';
 import RevenueDashboard from '@/Pages/TUTOR/Revenue';
+import TutorNotificationsPage from '@/Pages/TUTOR/TutorNotification';
 import { SocketProvider } from "@/lib/socketConfig";
 
 const TutorRoutes = () => {
@@ -103,6 +104,14 @@ const TutorRoutes = () => {
         element={
           <RequireAuth>
             <AddCoursePage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="tutornotification"
+        element={
+          <RequireAuth>
+            <TutorNotificationsPage />
           </RequireAuth>
         }
       />

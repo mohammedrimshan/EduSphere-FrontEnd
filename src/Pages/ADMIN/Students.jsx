@@ -346,7 +346,7 @@ const Students = () => {
               onChange={handleSearch}
             />
           </div>
-          <button
+          {/* <button
             className={`w-full sm:w-auto px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isDarkMode
                 ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
@@ -355,7 +355,7 @@ const Students = () => {
           >
             <FaFilter className="inline-block mr-2" />
             Filter
-          </button>
+          </button> */}
         </div>
 
         <div className="overflow-x-auto rounded-lg border dark:border-gray-700">

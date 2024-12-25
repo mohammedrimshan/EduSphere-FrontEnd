@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaBook, FaClock, FaExclamationCircle } from "react-icons/fa";
 import { toast, Toaster } from "sonner";
-import { Dialog, Transition } from '@headlessui/react'
+import { Dialog, Transition } from "@headlessui/react";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import axiosInterceptor from "@/axiosInstance";
@@ -17,12 +17,9 @@ import {
   MdOutlineFavoriteBorder,
   MdOutlineHome,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
-import { 
-  BsPeopleFill,
-  BsFillAwardFill,
-} from "react-icons/bs";
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 
 const EnrolledCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -33,7 +30,7 @@ const EnrolledCourses = () => {
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [refundReason, setRefundReason] = useState("");
-  const [isSubmitting,setIsSubmitting ]=useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const theme = useSelector((state) => state.theme.theme);
   const user = useSelector((state) => state.user.userDatas);
   const navigate = useNavigate();
@@ -46,32 +43,33 @@ const EnrolledCourses = () => {
         setIsLoading(false);
         return;
       }
-    
+
       try {
         const response = await axiosInterceptor.get(
           `/user/${user.id}/purchased-courses`
         );
         const coursesData = response.data?.courses || response.data || [];
-    
+
         const validatedCourses = Array.isArray(coursesData)
           ? coursesData.map((course) => {
               const totalLessons = course?.lessons?.length || 0;
-              
+
               // Calculate course progress where each lesson contributes equally
               let totalCourseProgress = 0;
-              course?.lessons?.forEach(lesson => {
+              course?.lessons?.forEach((lesson) => {
                 // Each lesson contributes equally to the total course progress
                 const lessonWeight = 100 / totalLessons; // e.g., 25% for 4 lessons
                 // If lesson has any progress, count it as completed
-                const lessonContribution = (lesson.currentTime > 0) ? lessonWeight : 0;
+                const lessonContribution =
+                  lesson.currentTime > 0 ? lessonWeight : 0;
                 totalCourseProgress += lessonContribution;
               });
-    
+
               // Count started lessons for display
-              const startedLessons = course?.lessons?.filter(lesson => 
-                lesson.currentTime > 0
-              ).length || 0;
-    
+              const startedLessons =
+                course?.lessons?.filter((lesson) => lesson.currentTime > 0)
+                  .length || 0;
+
               return {
                 ...course,
                 lessons: course?.lessons || [],
@@ -86,9 +84,9 @@ const EnrolledCourses = () => {
                 startedLessons,
                 enrollmentDate: course?.enrollmentDate || new Date(),
               };
-          })
+            })
           : [];
-    
+
         setCourses(validatedCourses);
       } catch (err) {
         console.error("Error fetching enrolled courses:", err);
@@ -132,34 +130,41 @@ const EnrolledCourses = () => {
       toast.error("Please provide a reason for the refund request.");
       return;
     }
-  
+
     if (!selectedCourse?._id) {
       toast.error("Invalid course selected");
       return;
     }
-  
+
     setIsSubmitting(true);
     try {
-      const response = await axiosInterceptor.post('/user/request-refund', {
+      const response = await axiosInterceptor.post("/user/request-refund", {
         courseId: selectedCourse._id,
-        reason: refundReason.trim()
+        reason: refundReason.trim(),
       });
-  
+
       if (response.status === 200) {
         toast.success("Refund request submitted successfully");
         setShowReturnModal(false);
         setRefundReason("");
-        
+
         // Update the courses list to reflect the refund status
-        setCourses(prevCourses => prevCourses.map(course => 
-          course._id === selectedCourse._id 
-            ? { ...course, refundRequested: true }
-            : course
-        ));
+        setCourses((prevCourses) =>
+          prevCourses.map((course) =>
+            course._id === selectedCourse._id
+              ? { ...course, refundRequested: true }
+              : course
+          )
+        );
       }
     } catch (error) {
-      console.error("Refund request error:", error.response?.data || error.message);
-      const errorMessage = error.response?.data?.message || "Failed to submit refund request. Please try again.";
+      console.error(
+        "Refund request error:",
+        error.response?.data || error.message
+      );
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to submit refund request. Please try again.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -186,8 +191,12 @@ const EnrolledCourses = () => {
       label: "Certificates",
       path: "/user/certificates",
     },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   const renderContent = () => {
@@ -242,9 +251,14 @@ const EnrolledCourses = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => {
           const enrollmentDate = new Date(course.enrollmentDate);
-          const daysSinceEnrollment = Math.floor((new Date() - enrollmentDate) / (1000 * 60 * 60 * 24));
+          const daysSinceEnrollment = Math.floor(
+            (new Date() - enrollmentDate) / (1000 * 60 * 60 * 24)
+          );
           const progressPercentage = course.progress;
-          const isReturnEligible = daysSinceEnrollment <= 30 && progressPercentage < 30 && !course.refundRequested;
+          const isReturnEligible =
+            daysSinceEnrollment <= 30 &&
+            progressPercentage < 30 &&
+            !course.refundRequested;
           return (
             <div
               key={course._id}
@@ -273,8 +287,8 @@ const EnrolledCourses = () => {
                   >
                     <p className="font-bold">Course Unavailable</p>
                     <p>
-                      This course is currently unavailable. Please contact support
-                      for more information.
+                      This course is currently unavailable. Please contact
+                      support for more information.
                     </p>
                   </div>
                 )}
@@ -346,7 +360,11 @@ const EnrolledCourses = () => {
         onConfirm={handleLogoutConfirm}
       />
       <Transition appear show={showReturnModal} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => setShowReturnModal(false)}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setShowReturnModal(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -379,7 +397,8 @@ const EnrolledCourses = () => {
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500 mb-4">
-                      Please provide a reason for returning this course. This action cannot be undone.
+                      Please provide a reason for returning this course. This
+                      action cannot be undone.
                     </p>
                     <textarea
                       className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none"
@@ -417,4 +436,3 @@ const EnrolledCourses = () => {
 };
 
 export default EnrolledCourses;
-

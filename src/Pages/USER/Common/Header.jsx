@@ -8,7 +8,7 @@ import React, {
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Menu, Search, X, ShoppingCart, Bell } from "lucide-react";
+import { Menu, Search, X, ShoppingCart, Bell, MoreVertical } from "lucide-react";
 import Button from "../../../ui/Button";
 import ThemeToggle from "../../../ui/themeToggle";
 import { toggleTheme } from "../../../Redux/Slices/themeSlice";
@@ -73,6 +73,7 @@ export default function Header({ isOpen, setIsOpen, handleLogoutClick }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(false);
   const searchTimeoutRef = useRef(null);
   const eventSourceRef = useRef(null);
   const cartItemCount = items.length;
@@ -121,6 +122,10 @@ export default function Header({ isOpen, setIsOpen, handleLogoutClick }) {
   useEffect(() => {
     console.log("Cart updated:", items);
   }, [items]);
+
+  const closeMobileNav = () => {
+    setShowMobileNav(false);
+  };
 
   const setupNotifications = useCallback(() => {
     if (!user) return;
@@ -353,6 +358,57 @@ export default function Header({ isOpen, setIsOpen, handleLogoutClick }) {
             className="h-8 w-8 rounded-full object-cover"
           />
           <ThemeToggle theme={theme} onToggle={() => dispatch(toggleTheme())} />
+          <div className="relative lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowMobileNav(!showMobileNav)}
+              className="ml-2"
+            >
+              <MoreVertical className="h-5 w-5" />
+            </Button>
+
+            {/* Mobile Navigation Dropdown */}
+            {showMobileNav && (
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
+                <Link
+                  to="/user/home"
+                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={closeMobileNav}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/user/aboutus"
+                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={closeMobileNav}
+                >
+                  About Us
+                </Link>
+                <Link
+                  to="/user/contact"
+                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={closeMobileNav}
+                >
+                  Contact
+                </Link>
+                <Link
+                  to="/user/fullcourse"
+                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={closeMobileNav}
+                >
+                  Courses
+                </Link>
+                <Link
+                  to="/user/alltutor"
+                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={closeMobileNav}
+                >
+                  Tutors
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

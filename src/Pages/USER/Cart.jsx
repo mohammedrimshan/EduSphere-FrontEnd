@@ -20,12 +20,9 @@ import {
   MdOutlineFavoriteBorder,
   MdOutlineHome,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
-import { 
-  BsPeopleFill,
-  BsFillAwardFill,
-} from "react-icons/bs";
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 const CartItemImage = ({ src, alt }) => {
   const [imageSrc, setImageSrc] = useState(src);
   const [imageError, setImageError] = useState(false);
@@ -87,8 +84,12 @@ const Cart = () => {
       label: "Certificates",
       path: "/user/certificates",
     },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   const handleThemeToggle = () => {
@@ -242,7 +243,6 @@ const Cart = () => {
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        
         <Header
           isOpen={isOpen}
           setIsOpen={setIsOpen}

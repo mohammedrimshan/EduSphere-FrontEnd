@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { FaStar } from 'react-icons/fa';
-import Header from '@/Pages/USER/Common/Header';
-import Footer from './Common/Footer';
-import Sidebar from '@/ui/sideBar';
-import LogoutModal from '@/ui/LogOutModal';
-import { logoutUser } from '@/Redux/Slices/userSlice';
-import { addToCart, fetchCart } from '@/Redux/Slices/cartSlice';
-import axiosInterceptor from '@/axiosInstance';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { FaStar } from "react-icons/fa";
+import Header from "@/Pages/USER/Common/Header";
+import Footer from "./Common/Footer";
+import Sidebar from "@/ui/sideBar";
+import LogoutModal from "@/ui/LogOutModal";
+import { logoutUser } from "@/Redux/Slices/userSlice";
+import { addToCart, fetchCart } from "@/Redux/Slices/cartSlice";
+import axiosInterceptor from "@/axiosInstance";
 import {
   MdOutlinePerson,
   MdLibraryBooks,
@@ -17,12 +17,9 @@ import {
   MdOutlineFavoriteBorder,
   MdOutlineHome,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
-import { 
-  BsPeopleFill,
-  BsFillAwardFill,
-} from "react-icons/bs";
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 const Wishlist = () => {
   const [wishlistCourses, setWishlistCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,8 +28,8 @@ const Wishlist = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('relevance');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("relevance");
 
   const theme = useSelector((state) => state.theme.theme);
   const user = useSelector((state) => state.user.userDatas);
@@ -47,10 +44,10 @@ const Wishlist = () => {
     }
 
     try {
-      const response = await axiosInterceptor.get('/user/fullwishlist', {
-        params: { page: pageNum, limit: 9, search: searchTerm, sort: sortBy }
+      const response = await axiosInterceptor.get("/user/fullwishlist", {
+        params: { page: pageNum, limit: 9, search: searchTerm, sort: sortBy },
       });
-      console.log(response)
+      console.log(response);
       setWishlistCourses(response.data.wishlist);
       setTotalPages(response.data.totalPages);
       setPage(response.data.page);
@@ -69,8 +66,8 @@ const Wishlist = () => {
   const handleRemoveFromWishlist = async (courseId) => {
     try {
       await axiosInterceptor.delete(`/user/removewishlist/${courseId}`);
-      setWishlistCourses(prevCourses => 
-        prevCourses.filter(course => course.id !== courseId)
+      setWishlistCourses((prevCourses) =>
+        prevCourses.filter((course) => course.id !== courseId)
       );
       toast.success("Course removed from wishlist");
     } catch (err) {
@@ -86,7 +83,7 @@ const Wishlist = () => {
       navigate("/user/login");
       return;
     }
-  
+
     try {
       const result = await dispatch(
         addToCart({
@@ -96,7 +93,7 @@ const Wishlist = () => {
           offer_percentage: course.offerPercentage || 0,
         })
       ).unwrap();
-  
+
       if (result.success) {
         toast.success("Course added to cart successfully");
         // Optionally remove the course from wishlist after adding to cart
@@ -134,7 +131,10 @@ const Wishlist = () => {
   };
 
   const renderCourseCard = (course) => (
-    <div key={course.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
+    <div
+      key={course.id}
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row">
           <div className="flex-shrink-0 w-full sm:w-24 h-40 sm:h-24 mb-4 sm:mb-0">
@@ -147,8 +147,12 @@ const Wishlist = () => {
           <div className="flex-grow sm:ml-6">
             <div className="flex flex-col sm:flex-row justify-between items-start">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{course.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">By {course.tutor}</p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {course.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  By {course.tutor}
+                </p>
               </div>
               <div className="flex flex-col items-start sm:items-end mt-2 sm:mt-0">
                 {course.offerPercentage > 0 ? (
@@ -173,8 +177,8 @@ const Wishlist = () => {
                     key={index}
                     className={`w-4 h-4 ${
                       index < Math.floor(course.rating)
-                        ? 'text-yellow-400'
-                        : 'text-gray-300'
+                        ? "text-yellow-400"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -183,7 +187,8 @@ const Wishlist = () => {
                 </span>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total {course.duration}  Weeks, {course.lesson} Lectures, {course.level}
+                Total {course.duration} Weeks, {course.lesson} Lectures,{" "}
+                {course.level}
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center mt-4 space-y-2 sm:space-y-0 sm:space-x-3">
@@ -208,28 +213,58 @@ const Wishlist = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header isOpen={isOpen} setIsOpen={setIsOpen} handleLogoutClick={handleLogoutClick} />
+      <Header
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleLogoutClick={handleLogoutClick}
+      />
       <Sidebar
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         theme={theme}
         handleLogout={handleLogoutClick}
-        menuItems ={ [
-            { icon: MdOutlineHome, label: "Home", path: "/user/home" },
-            { icon: MdOutlinePerson, label: "Profile", path: "/user/profile" },
-            { icon: MdLibraryBooks, label: "My Courses", path: "/user/my-courses" },
-            { icon: BsPeopleFill, label: "Teachers", path: "/user/mytutors" },
-            { icon: MdOutlineShoppingCart, label: "My Orders", path: "/user/payments/status" },
-            { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/user/wishlist" },
-            { icon: BsFillAwardFill, label: "Certificates", path: "/user/certificates" },
-            { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-            { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }  
+        menuItems={[
+          { icon: MdOutlineHome, label: "Home", path: "/user/home" },
+          { icon: MdOutlinePerson, label: "Profile", path: "/user/profile" },
+          {
+            icon: MdLibraryBooks,
+            label: "My Courses",
+            path: "/user/my-courses",
+          },
+          { icon: BsPeopleFill, label: "Teachers", path: "/user/mytutors" },
+          {
+            icon: MdOutlineShoppingCart,
+            label: "My Orders",
+            path: "/user/payments/status",
+          },
+          {
+            icon: MdOutlineFavoriteBorder,
+            label: "Wishlist",
+            path: "/user/wishlist",
+          },
+          {
+            icon: BsFillAwardFill,
+            label: "Certificates",
+            path: "/user/certificates",
+          },
+          {
+            icon: MdOutlineReceiptLong,
+            label: "Refund History",
+            path: "/user/refund-history",
+          },
+          {
+            icon: MdAccountBalanceWallet,
+            label: "Wallet",
+            path: "/user/wallet",
+          },
         ]}
       />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Wishlist</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Wishlist
+          </h1>
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             <input
               type="text"
@@ -238,7 +273,7 @@ const Wishlist = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full sm:w-auto"
             />
-            <select 
+            <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full sm:w-auto"
@@ -256,34 +291,39 @@ const Wishlist = () => {
               <p className="text-xl text-gray-600">Loading...</p>
             </div>
           ) : error ? (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
               <strong className="font-bold">Error: </strong>
               <span className="block sm:inline">{error}</span>
             </div>
           ) : wishlistCourses.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-xl mb-4 text-gray-600">Your wishlist is empty.</p>
+              <p className="text-xl mb-4 text-gray-600">
+                Your wishlist is empty.
+              </p>
               <button
-                onClick={() => navigate('/user/fullcourse')}
+                onClick={() => navigate("/user/fullcourse")}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
               >
                 Browse Courses
               </button>
             </div>
           ) : (
-            wishlistCourses.map(course => renderCourseCard(course))
+            wishlistCourses.map((course) => renderCourseCard(course))
           )}
         </div>
 
         {totalPages > 1 && (
           <div className="flex justify-center mt-8 space-x-2">
-            <button 
+            <button
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
               className={`px-4 py-2 rounded ${
-                page === 1 
-                  ? 'bg-gray-300 cursor-not-allowed' 
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                page === 1
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600 text-white"
               }`}
             >
               Previous
@@ -291,13 +331,13 @@ const Wishlist = () => {
             <span className="px-4 py-2 bg-gray-200 rounded">
               Page {page} of {totalPages}
             </span>
-            <button 
+            <button
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
               className={`px-4 py-2 rounded ${
-                page === totalPages 
-                  ? 'bg-gray-300 cursor-not-allowed' 
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                page === totalPages
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600 text-white"
               }`}
             >
               Next
@@ -305,7 +345,7 @@ const Wishlist = () => {
           </div>
         )}
       </main>
-      
+
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
@@ -316,4 +356,3 @@ const Wishlist = () => {
 };
 
 export default Wishlist;
-

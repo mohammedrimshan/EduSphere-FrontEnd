@@ -1,26 +1,23 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { useSelector } from 'react-redux';
-import { Dialog, Transition } from '@headlessui/react';
-import { toast } from 'sonner';
-import Header from './Common/Header';
-import Footer from './Common/Footer';
-import Sidebar from '../../ui/sideBar';
-import LogoutModal from '../../ui/LogOutModal';
-import axiosInterceptor from '@/axiosInstance';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, Fragment } from "react";
+import { useSelector } from "react-redux";
+import { Dialog, Transition } from "@headlessui/react";
+import { toast } from "sonner";
+import Header from "./Common/Header";
+import Footer from "./Common/Footer";
+import Sidebar from "../../ui/sideBar";
+import LogoutModal from "../../ui/LogOutModal";
+import axiosInterceptor from "@/axiosInstance";
+import { useNavigate } from "react-router-dom";
 import {
-    MdOutlinePerson,
-    MdLibraryBooks,
-    MdOutlineShoppingCart,
-    MdOutlineFavoriteBorder,
-    MdOutlineHome,
-    MdOutlineReceiptLong,
-    MdAccountBalanceWallet
-  } from "react-icons/md";
-  import { 
-    BsPeopleFill,
-    BsFillAwardFill,
-  } from "react-icons/bs";
+  MdOutlinePerson,
+  MdLibraryBooks,
+  MdOutlineShoppingCart,
+  MdOutlineFavoriteBorder,
+  MdOutlineHome,
+  MdOutlineReceiptLong,
+  MdAccountBalanceWallet,
+} from "react-icons/md";
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 const RefundHistory = () => {
   const [refunds, setRefunds] = useState([]);
   const [selectedRefund, setSelectedRefund] = useState(null);
@@ -31,7 +28,7 @@ const RefundHistory = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterStatus, setFilterStatus] = useState("");
 
   const theme = useSelector((state) => state.theme.theme);
   const navigate = useNavigate();
@@ -41,11 +38,27 @@ const RefundHistory = () => {
     { icon: MdOutlinePerson, label: "Profile", path: "/user/profile" },
     { icon: MdLibraryBooks, label: "My Courses", path: "/user/my-courses" },
     { icon: BsPeopleFill, label: "Teachers", path: "/user/mytutors" },
-    { icon: MdOutlineShoppingCart, label: "My Orders", path: "/user/payments/status" },
-    { icon: MdOutlineFavoriteBorder, label: "Wishlist", path: "/user/wishlist" },
-    { icon: BsFillAwardFill, label: "Certificates", path: "/user/certificates" },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineShoppingCart,
+      label: "My Orders",
+      path: "/user/payments/status",
+    },
+    {
+      icon: MdOutlineFavoriteBorder,
+      label: "Wishlist",
+      path: "/user/wishlist",
+    },
+    {
+      icon: BsFillAwardFill,
+      label: "Certificates",
+      path: "/user/certificates",
+    },
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   useEffect(() => {
@@ -55,13 +68,15 @@ const RefundHistory = () => {
   const fetchRefunds = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosInterceptor.get(`/user/myrefunds?page=${currentPage}&status=${filterStatus}`);
-    console.log(response.data)
+      const response = await axiosInterceptor.get(
+        `/user/myrefunds?page=${currentPage}&status=${filterStatus}`
+      );
+      console.log(response.data);
       setRefunds(response.data.refunds);
       setTotalPages(response.data.pagination.pages);
     } catch (error) {
-      setError('Failed to fetch refund history');
-      toast.error('Error loading refund history');
+      setError("Failed to fetch refund history");
+      toast.error("Error loading refund history");
     } finally {
       setIsLoading(false);
     }
@@ -70,32 +85,32 @@ const RefundHistory = () => {
   const fetchRefundDetails = async (refundId) => {
     try {
       const response = await axiosInterceptor.get(`/user/myrefund/${refundId}`);
-    console.log(response,"data")
+      console.log(response, "data");
       setSelectedRefund(response.data);
       setShowDetailsModal(true);
     } catch (error) {
-      toast.error('Error loading refund details');
+      toast.error("Error loading refund details");
     }
   };
 
   const handleLogoutConfirm = () => {
-    navigate('/user/login');
+    navigate("/user/login");
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      'pending': 'bg-yellow-100 text-yellow-800',
-      'approved': 'bg-green-100 text-green-800',
-      'rejected': 'bg-red-100 text-red-800'
+      pending: "bg-yellow-100 text-yellow-800",
+      approved: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
     };
-    return colors[status.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return colors[status.toLowerCase()] || "bg-gray-100 text-gray-800";
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -104,7 +119,10 @@ const RefundHistory = () => {
       return (
         <div className="grid gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <div
+              key={i}
+              className="animate-pulse bg-white dark:bg-gray-800 p-6 rounded-lg shadow"
+            >
               <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
               <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
@@ -124,7 +142,9 @@ const RefundHistory = () => {
     if (refunds.length === 0) {
       return (
         <div className="text-center py-8">
-          <p className="text-xl mb-4 dark:text-white">No refund requests found.</p>
+          <p className="text-xl mb-4 dark:text-white">
+            No refund requests found.
+          </p>
         </div>
       );
     }
@@ -132,7 +152,10 @@ const RefundHistory = () => {
     return (
       <div className="grid gap-4">
         {refunds.map((refund) => (
-          <div key={refund.refundId} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+          <div
+            key={refund.refundId}
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow"
+          >
             <div className="flex items-start justify-between">
               <div className="flex items-center">
                 <img
@@ -141,15 +164,23 @@ const RefundHistory = () => {
                   className="w-24 h-24 object-cover rounded mr-4"
                 />
                 <div>
-                  <h3 className="text-lg font-semibold dark:text-white">{refund.course.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300">Amount: ₹{refund.amount}</p>
+                  <h3 className="text-lg font-semibold dark:text-white">
+                    {refund.course.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Amount: ₹{refund.amount}
+                  </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     Requested on: {formatDate(refund.requestDate)}
                   </p>
                 </div>
               </div>
               <div className="flex flex-col items-end">
-                <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(refund.status)}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
+                    refund.status
+                  )}`}
+                >
                   {refund.status}
                 </span>
                 <button
@@ -180,7 +211,7 @@ const RefundHistory = () => {
         handleLogout={() => setShowLogoutModal(true)}
         menuItems={menuItems}
       />
-      
+
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold dark:text-white">Refund History</h1>
@@ -195,13 +226,13 @@ const RefundHistory = () => {
             <option value="rejected">Rejected</option>
           </select>
         </div>
-        
+
         {renderContent()}
-        
+
         {totalPages > 1 && (
           <div className="flex justify-center mt-6 gap-2">
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
             >
@@ -211,7 +242,7 @@ const RefundHistory = () => {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
             >
@@ -222,7 +253,7 @@ const RefundHistory = () => {
       </main>
 
       <Footer />
-      
+
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
@@ -269,32 +300,58 @@ const RefundHistory = () => {
                       </Dialog.Title>
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-medium dark:text-white">Course</h4>
-                          <p className="text-gray-600 dark:text-gray-300">{selectedRefund.course.title}</p>
+                          <h4 className="font-medium dark:text-white">
+                            Course
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-300">
+                            {selectedRefund.course.title}
+                          </p>
                         </div>
                         <div>
-                          <h4 className="font-medium dark:text-white">Amount</h4>
-                          <p className="text-gray-600 dark:text-gray-300">₹{selectedRefund.refund.amount}</p>
+                          <h4 className="font-medium dark:text-white">
+                            Amount
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-300">
+                            ₹{selectedRefund.refund.amount}
+                          </p>
                         </div>
                         <div>
-                          <h4 className="font-medium dark:text-white">Reason</h4>
-                          <p className="text-gray-600 dark:text-gray-300">{selectedRefund.refund.reason}</p>
+                          <h4 className="font-medium dark:text-white">
+                            Reason
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-300">
+                            {selectedRefund.refund.reason}
+                          </p>
                         </div>
                         <div>
-                          <h4 className="font-medium dark:text-white">Status</h4>
-                          <span className={`inline-block px-3 py-1 rounded-full text-sm ${getStatusColor(selectedRefund.refund.status)}`}>
+                          <h4 className="font-medium dark:text-white">
+                            Status
+                          </h4>
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-sm ${getStatusColor(
+                              selectedRefund.refund.status
+                            )}`}
+                          >
                             {selectedRefund.refund.status}
                           </span>
                         </div>
                         {selectedRefund.refund.adminNote && (
                           <div>
-                            <h4 className="font-medium dark:text-white">Admin Note</h4>
-                            <p className="text-gray-600 dark:text-gray-300">{selectedRefund.refund.adminNote}</p>
+                            <h4 className="font-medium dark:text-white">
+                              Admin Note
+                            </h4>
+                            <p className="text-gray-600 dark:text-gray-300">
+                              {selectedRefund.refund.adminNote}
+                            </p>
                           </div>
                         )}
                         <div>
-                          <h4 className="font-medium dark:text-white">Course Progress</h4>
-                          <p className="text-gray-600 dark:text-gray-300">{Math.round(selectedRefund.metrics.progress)}%</p>
+                          <h4 className="font-medium dark:text-white">
+                            Course Progress
+                          </h4>
+                          <p className="text-gray-600 dark:text-gray-300">
+                            {Math.round(selectedRefund.metrics.progress)}%
+                          </p>
                         </div>
                       </div>
                       <div className="mt-4">

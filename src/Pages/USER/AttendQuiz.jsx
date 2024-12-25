@@ -12,7 +12,7 @@ import {
   MdOutlineShoppingCart,
   MdOutlineFavoriteBorder,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
 import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { User, Book, Calendar, Mail, Menu, MessageCircle } from 'lucide-react';
+import { User, Book, Calendar, Mail, Menu, MessageCircle } from "lucide-react";
 import axiosInterceptor from "@/axiosInstance";
 import { logoutUser } from "../../Redux/Slices/userSlice";
 import { toggleTheme } from "../../Redux/Slices/themeSlice";
@@ -12,7 +12,7 @@ import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import LogoutModal from "@/ui/LogOutModal";
 import ChatComponent from "@/Pages/USER/UserChatPage";
-import UserChatComponent from '@/Pages/USER/Common/UserChatComponent';
+import UserChatComponent from "@/Pages/USER/Common/UserChatComponent";
 import {
   MdOutlinePerson,
   MdLibraryBooks,
@@ -20,13 +20,10 @@ import {
   MdOutlineFavoriteBorder,
   MdOutlineHome,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
-import { 
-  BsPeopleFill,
-  BsFillAwardFill,
-} from "react-icons/bs";
-import { X } from 'lucide-react';
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
+import { X } from "lucide-react";
 
 const EnrolledTutors = () => {
   const navigate = useNavigate();
@@ -92,8 +89,12 @@ const EnrolledTutors = () => {
       label: "Certificates",
       path: "/user/certificates",
     },
-    { icon: MdOutlineReceiptLong, label: "Refund History", path: "/user/refund-history" },
-    { icon: MdAccountBalanceWallet , label: "Wallet", path: "/user/wallet" }
+    {
+      icon: MdOutlineReceiptLong,
+      label: "Refund History",
+      path: "/user/refund-history",
+    },
+    { icon: MdAccountBalanceWallet, label: "Wallet", path: "/user/wallet" },
   ];
 
   useEffect(() => {
@@ -103,7 +104,7 @@ const EnrolledTutors = () => {
         const response = await axiosInterceptor.get(
           `/user/enrolled-tutors/${user.id}`
         );
-        console.log(response)
+        console.log(response);
         if (response.data.success) {
           setTutors(response.data.tutors);
         }
@@ -118,19 +119,19 @@ const EnrolledTutors = () => {
   }, [user.id]);
 
   const handleOpenChat = (tutor) => {
-    console.log('Tutor data for chat:', {
+    console.log("Tutor data for chat:", {
       tutor,
       userId: tutor.user_id,
-      tutorId: tutor._id
+      tutorId: tutor._id,
     });
-  
-    navigate('/user/chat', { 
-      state: { 
-        tutorId: tutor.user_id || tutor._id
-      } 
+
+    navigate("/user/chat", {
+      state: {
+        tutorId: tutor.user_id || tutor._id,
+      },
     });
   };
-  
+
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900">
       <Sidebar
@@ -287,8 +288,13 @@ const EnrolledTutors = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl h-[600px] flex flex-col">
             <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-              <h3 className="text-lg font-semibold dark:text-white">Chat with {selectedTutor.full_name}</h3>
-              <button onClick={() => setSelectedTutor(null)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              <h3 className="text-lg font-semibold dark:text-white">
+                Chat with {selectedTutor.full_name}
+              </h3>
+              <button
+                onClick={() => setSelectedTutor(null)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -303,4 +309,3 @@ const EnrolledTutors = () => {
 };
 
 export default EnrolledTutors;
-

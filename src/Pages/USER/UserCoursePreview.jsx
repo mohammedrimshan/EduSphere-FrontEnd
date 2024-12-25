@@ -25,12 +25,9 @@ import {
   MdOutlineFavoriteBorder,
   MdOutlineHome,
   MdOutlineReceiptLong,
-  MdAccountBalanceWallet
+  MdAccountBalanceWallet,
 } from "react-icons/md";
-import { 
-  BsPeopleFill,
-  BsFillAwardFill,
-} from "react-icons/bs";
+import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 import { addToCart, removeFromCart, fetchCart } from "@/Redux/Slices/cartSlice";
 import ReportCourseDialog from "@/Pages/USER/Common/ReportCourse";
 import { toast } from "sonner";

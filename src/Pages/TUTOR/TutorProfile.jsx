@@ -341,7 +341,7 @@ export default function TutorProfile() {
     { icon: MdDashboard, label: "Dashboard", path: "/tutor/dashboard" },
     { icon: MdOutlinePerson, label: "Profile", path: "/tutor/tutor-profile" },
     { icon: MdLibraryBooks, label: "Courses", path: "/tutor/courses" },
-    { icon: MdAttachMoney, label: "Revenues", path: "/revenues" },
+    { icon: MdAttachMoney, label: "Revenues", path: "/tutor/revenue" },
     { icon: BsCameraVideo, label: "Chat & Video", path: "/tutor/chat" },
     { icon: BsClipboardCheck, label: "Quiz", path: "/tutor/quizmanage" },
     { icon: MdReport, label: "Course Reports", path: "/tutor/courselist" },

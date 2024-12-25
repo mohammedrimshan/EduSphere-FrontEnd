@@ -199,14 +199,14 @@ const Tutors = () => {
           <span className="font-bold sm:hidden mr-2">ID:</span>
           {tutor.id}
         </td>
-        <td className={`px-3 py-2 sm:py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}>
+        {/* <td className={`px-3 py-2 sm:py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}>
           <span className="font-bold sm:hidden mr-2">Specialization:</span>
           {tutor.specialization}
-        </td>
-        <td className={`px-3 py-2 sm:py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}>
+        </td> */}
+        {/* <td className={`px-3 py-2 sm:py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}>
           <span className="font-bold sm:hidden mr-2">Experience:</span>
           {tutor.experience}
-        </td>
+        </td> */}
         <td className={`px-3 py-2 sm:py-4 whitespace-nowrap text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"}`}>
           <span className="font-bold sm:hidden mr-2">Courses:</span>
           {tutor.coursesCount}
@@ -324,7 +324,7 @@ const Tutors = () => {
               onChange={handleSearch}
             />
           </div>
-          <button
+          {/* <button
             className={`w-full sm:w-auto px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isDarkMode
                 ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
@@ -333,7 +333,7 @@ const Tutors = () => {
           >
             <FaFilter className="inline-block mr-2" />
             Filter
-          </button>
+          </button> */}
         </div>
 
         <div className="overflow-x-auto rounded-lg border dark:border-gray-700">
@@ -345,8 +345,8 @@ const Tutors = () => {
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">S1</th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Tutor Name</th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Tutor ID</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Specialization</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Experience</th>
+                    {/* <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Specialization</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Experience</th> */}
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Courses</th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Status</th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">

@@ -8,7 +8,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
-import { loginUser,setAccessToken } from "../../Redux/Slices/userSlice";
+import { loginUser, setAccessToken } from "../../Redux/Slices/userSlice";
 import { loginTutor } from "@/Redux/Slices/tutorSlice";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
@@ -74,64 +74,68 @@ export default function Login() {
     e.preventDefault();
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
-  
+
     if (!isEmailValid || !isPasswordValid) {
       toast.error("Please correct the errors before submitting");
       return;
     }
-  
+
     const userData = {
       email: email,
       password: password,
     };
-  
+
     try {
       console.log("Attempting login with:", { email });
       const response = await axiosInterceptor.post(`/user/login`, userData);
       console.log("Login response:", response);
-  
+
       if (response.status === 200 && response.data.user) {
-        // Store access token and refresh token 
-        localStorage.setItem('token', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        
+        // Store access token and refresh token
+        localStorage.setItem("token", response.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+
         // Update user data to include tokens
         const updatedUserData = {
           ...response.data.user,
           accessToken: response.data.accessToken,
-          refreshToken: response.data.refreshToken
+          refreshToken: response.data.refreshToken,
         };
-  
+
         // Dispatch user data with tokens
         dispatch(loginUser(updatedUserData));
         dispatch(setAccessToken(response.data.accessToken));
         // Handle tutor data if exists
         const tutor = response.data.tutor;
         if (tutor) {
-          dispatch(loginTutor({
-            id: tutor.id,
-            full_name: tutor.full_name,
-            email: tutor.email,
-            phone: tutor.phone,
-            tutor_id: tutor.id,
-            profile_image: tutor.profile_image,
-            status: tutor.status,
-            courses: tutor.courses,
-            is_verified: tutor.is_verified,
-            lastActive: tutor.lastActive,
-            lastLogin: tutor.lastLogin,
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken
-          }));
+          dispatch(
+            loginTutor({
+              id: tutor.id,
+              full_name: tutor.full_name,
+              email: tutor.email,
+              phone: tutor.phone,
+              tutor_id: tutor.id,
+              profile_image: tutor.profile_image,
+              status: tutor.status,
+              courses: tutor.courses,
+              is_verified: tutor.is_verified,
+              lastActive: tutor.lastActive,
+              lastLogin: tutor.lastLogin,
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+            })
+          );
         }
-  
+
         // Configure axios default header for future requests
-        axiosInterceptor.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
-  
+        axiosInterceptor.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${response.data.accessToken}`;
+
         toast.success(response.data.message || "Login successful", {
           duration: 3000,
         });
-  
+
         setTimeout(() => {
           navigate(from);
         }, 1000);
@@ -141,16 +145,16 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Login error:", error);
-  
+
       // Clear any existing tokens on error
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      delete axiosInterceptor.defaults.headers.common['Authorization'];
-  
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      delete axiosInterceptor.defaults.headers.common["Authorization"];
+
       if (error.response) {
         const { status, data } = error.response;
         console.error(`Error response - Status: ${status}, Data:`, data);
-  
+
         if (status === 401) {
           toast.error(data.message || "Invalid credentials", {
             duration: 4000,
@@ -183,33 +187,34 @@ export default function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axiosInterceptor.post(
-        `/auth/user/google`,
-        { token: credentialResponse.credential }
-      );
-      
+      const response = await axiosInterceptor.post(`/auth/user/google`, {
+        token: credentialResponse.credential,
+      });
+
       if (response.data.accessToken && response.data.refreshToken) {
         // Store the complete user data object in Redux and localStorage
         const userData = {
           ...response.data.user,
           accessToken: response.data.accessToken,
-          refreshToken: response.data.refreshToken
+          refreshToken: response.data.refreshToken,
         };
-  
+
         // Dispatch to Redux store
         dispatch(loginUser(userData));
-  
+
         // Configure axios default header
-        axiosInterceptor.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
-  
+        axiosInterceptor.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${response.data.accessToken}`;
+
         toast.success("Login successful");
         setTimeout(() => navigate("/user/home"), 1000);
       }
     } catch (error) {
       // Clear any existing tokens on error
-      localStorage.removeItem('userDatas');
-      delete axiosInterceptor.defaults.headers.common['Authorization'];
-  
+      localStorage.removeItem("userDatas");
+      delete axiosInterceptor.defaults.headers.common["Authorization"];
+
       if (error.response && error.response.data.code === "ACCOUNT_BLOCKED") {
         toast.error("Your account is blocked. Contact support.");
       } else {

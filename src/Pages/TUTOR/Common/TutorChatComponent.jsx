@@ -3,12 +3,13 @@ import { useSelector } from "react-redux";
 import { useSocket } from "@/lib/socketConfig";
 import { useTutorAuth } from "@/Context/TutorAuthContext";
 import axiosInterceptor from "@/axiosInstance";
-import { Send, Loader, Smile } from "lucide-react";
+import { Send, Loader, Smile } from 'lucide-react';
 import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { UploadMenu } from "@/ui/uploadMenu";
 import EmojiPicker from "emoji-picker-react";
+import { MessageComponent, ReplyBar } from "@/ui/Reply";
 
 const TutorChatComponent = ({ studentId, chatId }) => {
   const [chat, setChat] = useState(null);
@@ -22,6 +23,8 @@ const TutorChatComponent = ({ studentId, chatId }) => {
     isOnline: false,
     avatar: "",
   });
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [selectedMessage, setSelectedMessage] = useState(null); // Added state for selected message
   const theme = useSelector((state) => state.theme.theme);
   const [isStudentTyping, setIsStudentTyping] = useState(false);
   const {
@@ -62,6 +65,20 @@ const TutorChatComponent = ({ studentId, chatId }) => {
       socket.on("student-stop-typing", () => setIsStudentTyping(false));
       socket.on("user-status-change", handleUserStatusChange);
       socket.on("self-status-change", handleSelfStatusChange);
+      socket.on(
+        "message-deleted",
+        ({ message_id, chat_id, latest_message }) => {
+          setMessages((prevMessages) =>
+            prevMessages.filter((msg) => msg.message_id !== message_id)
+          );
+          if (latest_message) {
+            setChat((prevChat) => ({
+              ...prevChat,
+              last_message: latest_message,
+            }));
+          }
+        }
+      );
 
       joinChatRoom(chat._id);
       requestUserStatus(studentId);
@@ -74,6 +91,7 @@ const TutorChatComponent = ({ studentId, chatId }) => {
         socket.off("student-stop-typing");
         socket.off("user-status-change", handleUserStatusChange);
         socket.off("self-status-change", handleSelfStatusChange);
+        socket.off("message-deleted");
       };
     }
   }, [socket, chat, studentId, tutor.id]);
@@ -209,6 +227,8 @@ const TutorChatComponent = ({ studentId, chatId }) => {
         sender_id: tutor.id,
         receiver_id: studentId,
         message: newMessage.trim(),
+        replyTo: replyingTo ? replyingTo._id : null,
+        selectedMessageId: selectedMessage ? selectedMessage._id : null, // Added selectedMessageId
       };
 
       const response = await axiosInterceptor.post(
@@ -230,6 +250,8 @@ const TutorChatComponent = ({ studentId, chatId }) => {
       });
 
       setNewMessage("");
+      setReplyingTo(null);
+      setSelectedMessage(null); // Reset selected message after sending
 
       if (socket && isConnected) {
         console.log("TutorChatComponent: Emitting send-message event", {
@@ -245,8 +267,93 @@ const TutorChatComponent = ({ studentId, chatId }) => {
       toast.error("Failed to send message. Please try again.");
     }
   };
+
+  const validateFile = (file) => {
+    // Maximum file sizes (in bytes)
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+
+    // Allowed file types
+    const ALLOWED_IMAGE_TYPES = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+
+    return new Promise((resolve, reject) => {
+      // Check if file exists
+      if (!file) {
+        reject(new Error("No file selected"));
+        return;
+      }
+
+      // Validate image files
+      if (file.type.startsWith("image/")) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+          reject(
+            new Error(
+              "Invalid image format. Supported formats: JPG, PNG, GIF, WEBP"
+            )
+          );
+          return;
+        }
+        if (file.size > MAX_IMAGE_SIZE) {
+          reject(new Error("Image size should not exceed 5MB"));
+          return;
+        }
+      }
+
+      // Validate video files
+      else if (file.type.startsWith("video/")) {
+        if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+          reject(
+            new Error(
+              "Invalid video format. Supported formats: MP4, WebM, QuickTime"
+            )
+          );
+          return;
+        }
+        if (file.size > MAX_VIDEO_SIZE) {
+          reject(new Error("Video size should not exceed 100MB"));
+          return;
+        }
+      }
+
+      // Validate dimensions for images
+      if (file.type.startsWith("image/")) {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        img.onload = () => {
+          URL.revokeObjectURL(img.src);
+
+          const MAX_DIMENSION = 4096; // Maximum width or height in pixels
+
+          if (img.width > MAX_DIMENSION || img.height > MAX_DIMENSION) {
+            reject(
+              new Error("Image dimensions should not exceed 4096x4096 pixels")
+            );
+            return;
+          }
+
+          resolve(true);
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(img.src);
+          reject(new Error("Failed to load image for validation"));
+        };
+      } else {
+        resolve(true);
+      }
+    });
+  };
+
   const handleUpload = async (file) => {
     try {
+      await validateFile(file);
       // Validate file
       if (!file) {
         throw new Error("No file selected");
@@ -301,6 +408,10 @@ const TutorChatComponent = ({ studentId, chatId }) => {
         throw new Error("No secure URL returned from Cloudinary");
       }
 
+      // Dismiss loading toast and show success
+      toast.dismiss(loadingToast);
+      toast.success("File uploaded successfully");
+
       // Log successful upload
       console.log("File uploaded successfully", {
         fileUrl: data.secure_url,
@@ -346,6 +457,7 @@ const TutorChatComponent = ({ studentId, chatId }) => {
       });
 
       // User-friendly error toast
+      toast.dismiss();
       toast.error(error.message || "Failed to upload file. Please try again.");
 
       throw error;
@@ -388,6 +500,36 @@ const TutorChatComponent = ({ studentId, chatId }) => {
       });
       socket.emit("tutor-typing", { chat_id: chat._id });
     }
+  };
+
+  const handleReply = (message) => {
+    setReplyingTo(message);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  const handleDeleteMessage = async (messageId, chatId) => {
+    try {
+      console.log("Deleting message:", { messageId, chatId });
+
+      const response = await axiosInterceptor.delete(
+        `/tutor/messages/${chatId}/${messageId}`
+      );
+
+      if (response.data?.status === "success") {
+        toast.success("Message deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      toast.error("Failed to delete message");
+    }
+  };
+
+  // Usage in the component:
+  const onDelete = async (chatId, messageId) => {
+    await handleDeleteMessage(chatId, messageId);
   };
 
   if (loading) {
@@ -435,69 +577,23 @@ const TutorChatComponent = ({ studentId, chatId }) => {
             <p className="text-sm">Start the conversation with your student!</p>
           </div>
         ) : (
-          messages.map((message, index) => {
-            const isTutor = message.sender_id === tutor.id;
-            return (
-              <div
-                key={message._id || index}
-                className={`flex ${isTutor ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`flex items-end ${
-                    isTutor ? "flex-row-reverse" : "flex-row"
-                  }`}
-                >
-                  <img
-                    src={
-                      isTutor
-                        ? tutor.profile_image || "/default-tutor.png"
-                        : studentInfo.avatar || "/default-user.png"
-                    }
-                    alt={isTutor ? "Tutor" : "Student"}
-                    className="w-8 h-8 rounded-full mx-2 object-cover"
-                  />
-                  <div
-                    className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                      isTutor
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-200 text-gray-900"
-                    }`}
-                  >
-                    <p className="break-words">{message.message_text}</p>
-                    {message.file_url && (
-                      <div className="mt-2">
-                        {message.file_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                          <img
-                            src={message.file_url}
-                            alt="Shared image"
-                            className="rounded-lg object-cover max-w-full h-auto"
-                          />
-                        ) : message.file_url.match(/\.(mp4|webm)$/i) ? (
-                          <video
-                            controls
-                            className="rounded-lg max-w-full h-auto"
-                            src={message.file_url}
-                          />
-                        ) : (
-                          <a
-                            href={message.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm underline"
-                          >
-                            Attached File
-                          </a>
-                        )}
-                      </div>
-                    )}
-                    <div className="text-[11px] mt-1 text-black-300">
-                      {moment(message.createdAt).fromNow()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })
+          messages.map((message) => (
+            <MessageComponent
+              key={message._id}
+              message={message}
+              messages={messages} // Add this line
+              isUser={message.sender_id === tutor.id}
+              userImage={tutor.profile_image}
+              otherImage={studentInfo.avatar}
+              onReply={handleReply}
+              onDelete={() => handleDeleteMessage(message.message_id, chat._id)}
+              theme={theme}
+              moment={moment}
+              isSelected={selectedMessage && selectedMessage._id === message._id} // Added isSelected prop
+              onSelect={setSelectedMessage} // Added onSelect prop
+              selectedMessage={selectedMessage} // Added selectedMessage prop
+            />
+          ))
         )}
         {isStudentTyping && (
           <div className="flex items-start space-x-2">
@@ -524,10 +620,18 @@ const TutorChatComponent = ({ studentId, chatId }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className={`border-t p-4 rounded-b-lg ${
-        theme === "dark" ? "bg-gray-900" : "bg-white"
-      }`}>
+      <div
+        className={`border-t p-4 rounded-b-lg ${
+          theme === "dark" ? "bg-gray-900" : "bg-white"
+        }`}
+      >
+        <ReplyBar
+          replyingTo={replyingTo}
+          onCancelReply={handleCancelReply}
+          theme={theme}
+        />
         <form onSubmit={sendMessage} className="flex items-center space-x-2">
+          
           <div className="relative">
             <Button
               type="button"
