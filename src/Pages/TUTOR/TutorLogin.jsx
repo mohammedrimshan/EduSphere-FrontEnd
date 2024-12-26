@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React,{ useState } from "react";
 import { Eye, EyeOff, AlertTriangle } from "lucide-react";
 import TutorLoginBanner from "@/assets/TutorLogin.jpg";
 import Goolge from "@/assets/Google.png";

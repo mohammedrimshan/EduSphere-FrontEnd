@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React,{ useState } from "react";
 import { Eye, EyeOff, AlertTriangle } from "lucide-react";
 import AdminBanner from "@/assets/AdminLogin.jpg";
 import { GoogleLogin } from "@react-oauth/google";
