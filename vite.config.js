@@ -21,6 +21,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'react-dom': 'react-dom',
       crypto: 'crypto-browserify', // Alias for crypto module
       global: 'globalThis', // Polyfill for global
       stream: 'rollup-plugin-node-polyfills/polyfills/stream', // Polyfill for stream
