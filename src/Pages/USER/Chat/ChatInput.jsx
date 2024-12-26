@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Textarea} from '@/components/ui/Textarea';
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui/button';
 
 const MessageInput = ({ onSendMessage }) => {
   const [message, setMessage] = useState('');
