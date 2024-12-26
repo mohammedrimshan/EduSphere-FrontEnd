@@ -4,46 +4,40 @@ import path from 'path';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    nodePolyfills({
-      crypto: true,
-      buffer: true,
-      stream: true, // Adding other necessary polyfills
-      events: true,
-      util: true,
-      process: true
-    }),
-  ],
-  optimizeDeps: {
-    include: ['crypto-browserify', '@react-oauth/google'],
-  },
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      'react-dom': 'react-dom',
-      crypto: 'crypto-browserify', // Alias for crypto module
-      global: 'globalThis', // Polyfill for global
-      stream: 'rollup-plugin-node-polyfills/polyfills/stream', // Polyfill for stream
-      events: 'rollup-plugin-node-polyfills/polyfills/events', // Polyfill for events
-      util: 'rollup-plugin-node-polyfills/polyfills/util', // Polyfill for util
-      buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6', // Polyfill for buffer
-      process: 'rollup-plugin-node-polyfills/polyfills/process-es6', // Polyfill for process
-      'webrtc-adapter': 'webrtc-adapter/out/adapter_no_edge_no_global', // WebRTC adapter (specific to your use case)
+      'react': path.resolve(__dirname, './node_modules/react'),
+      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+      'react-is': path.resolve(__dirname, './node_modules/react-is'),
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify',
+      buffer: 'buffer',
     },
   },
-  define: {
-    'process.env': {},
-    global: 'globalThis', // Define global variable for polyfills
+  optimizeDeps: {
+    include: [
+      'react-redux',
+      'react-is',
+      '@reduxjs/toolkit',
+      'react',
+      'react-dom',
+      '@react-oauth/google'
+    ],
+    esbuildOptions: {
+      target: 'es2020'
+    }
   },
   build: {
+    target: 'es2020',
     rollupOptions: {
-      plugins: [
-        nodePolyfills({
-          crypto: true,
-          buffer: true, // You can toggle these options as needed
-        }),
-      ],
-    },
-  },
+      external: ['react-is'],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-redux', '@reduxjs/toolkit'],
+        }
+      }
+    }
+  }
 });

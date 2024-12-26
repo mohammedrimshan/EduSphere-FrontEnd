@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast, Toaster } from "sonner";

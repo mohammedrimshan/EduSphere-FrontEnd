@@ -1,3 +1,4 @@
+"use client";
 import { MoreHorizontal } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
