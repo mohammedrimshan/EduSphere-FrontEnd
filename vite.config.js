@@ -23,7 +23,6 @@ export default defineConfig({
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
-      process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
     },
   },
   define: {
