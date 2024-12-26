@@ -19,7 +19,7 @@ import {
 } from "react-icons/md";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
 import { updateTutor, logoutTutor } from "@/redux/slices/tutorSlice";
-import { toggleTheme } from "@/redux/slices/themeSlice";
+import { toggleTheme } from "@/Redux/Slices/themeSlice";
 import axios from "axios";
 import axiosInterceptor from "@/axiosInstance";
 import { toast } from "sonner";
