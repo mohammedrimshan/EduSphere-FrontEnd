@@ -9,7 +9,7 @@ export default defineConfig({
     nodePolyfills({
       crypto: true,
       buffer: true,
-      stream: true, // Adding other necessary polyfills
+      stream: true,
       events: true,
       util: true,
       process: true
@@ -23,12 +23,16 @@ export default defineConfig({
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
-    },
+    }
   },
   define: {
-    'process.env': {},
-    global: 'globalThis', // Define global variable for polyfills
+    // More specific global definitions
+    'process.env': JSON.stringify(process.env),
+    global: '({})',
+    'global.Buffer': 'Buffer',
+    'global.process': 'process'
   },
+  // Rest of your config remains the same
   optimizeDeps: {
     include: [
       'react-redux',
