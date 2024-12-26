@@ -10,7 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       'react': path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
-      'react-is': path.resolve(__dirname, './node_modules/react-is'),
+      'react-is': './node_modules/react-is/index.js',
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
