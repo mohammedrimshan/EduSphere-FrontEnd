@@ -6,14 +6,7 @@ import nodePolyfills from 'rollup-plugin-node-polyfills';
 export default defineConfig({
   plugins: [
     react(),
-    nodePolyfills({
-      crypto: true,
-      buffer: true,
-      stream: true,
-      events: true,
-      util: true,
-      process: true
-    }),
+    
   ],
   resolve: {
     alias: {
@@ -23,16 +16,8 @@ export default defineConfig({
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
-    }
+    },
   },
-  define: {
-    // More specific global definitions
-    'process.env': JSON.stringify(process.env),
-    global: '({})',
-    'global.Buffer': 'Buffer',
-    'global.process': 'process'
-  },
-  // Rest of your config remains the same
   optimizeDeps: {
     include: [
       'react-redux',
