@@ -23,7 +23,7 @@ import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import Sidebar from "@/ui/sideBar";
 import LogoutModal from "@/ui/LogOutModal";
-import { toggleTheme } from "@/redux/slices/themeSlice";
+import { toggleTheme } from "@/redux/slices/themeSlice.jsx";
 import { updateUser, logoutUser } from "@/Redux/Slices/userSlice";
 import axios from "axios";
 import { toast } from "sonner";
