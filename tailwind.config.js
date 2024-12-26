@@ -1,3 +1,5 @@
+
+import scrollbar from "tailwind-scrollbar-hide"
 // tailwind.config.js
 export default {
   darkMode: 'class',
@@ -34,7 +36,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require('tailwind-scrollbar-hide')
-  ],
+  plugins: [scrollbar],
 };
