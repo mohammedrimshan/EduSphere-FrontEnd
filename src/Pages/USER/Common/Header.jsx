@@ -9,11 +9,11 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Menu, Search, X, ShoppingCart, Bell, MoreVertical } from "lucide-react";
-import Button from "@/../ui/Button";
-import ThemeToggle from "@/../ui/themeToggle";
-import { toggleTheme } from "@/../Redux/Slices/themeSlice";
-import { fetchCart } from "@/../Redux/Slices/cartSlice";
-import avatar from "@/../assets/avt.webp";
+import Button from "@/ui/Button";
+import ThemeToggle from "@/ui/themeToggle";
+import { toggleTheme } from "@/Redux/Slices/themeSlice";
+import { fetchCart } from "@/Redux/Slices/cartSlice";
+import avatar from "@/assets/avt.webp";
 import { useAuth } from "@/Context/AuthContext";
 import axiosInterceptor from "@/axiosInstance";
 
