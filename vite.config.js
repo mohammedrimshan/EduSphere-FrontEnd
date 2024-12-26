@@ -4,7 +4,17 @@ import path from 'path';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    nodePolyfills({
+      crypto: true,
+      buffer: true,
+      stream: true, // Adding other necessary polyfills
+      events: true,
+      util: true,
+      process: true
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -13,7 +23,12 @@ export default defineConfig({
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
+      process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
     },
+  },
+  define: {
+    'process.env': {},
+    global: 'globalThis', // Define global variable for polyfills
   },
   optimizeDeps: {
     include: [

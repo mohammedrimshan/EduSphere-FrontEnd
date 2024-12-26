@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import axiosInterceptor from '@/axiosInstance';
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+const API_BASE_URL = "http://localhost:5000/user";
 export const fetchCart = createAsyncThunk(
   'cart/fetchCart',
   async (userId, { rejectWithValue }) => {
