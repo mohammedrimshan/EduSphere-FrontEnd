@@ -32,7 +32,7 @@ const Modal = ({ open, onClose, children }) => {
 };
 
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+   "http://localhost:5000/user";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");

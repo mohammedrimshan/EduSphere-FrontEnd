@@ -30,7 +30,7 @@ import LogoutModal from "@/ui/LogOutModal";
 import { useNavigate } from "react-router-dom";
 import OtpModal from "@/ui/OTP";
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/tutor";
+   "http://localhost:5000/tutor";
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);

@@ -61,7 +61,7 @@ const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const API_BASE_URL =
-    process.env.REACT_APP_API_URL || "http://localhost:5000/admin";
+     "http://localhost:5000/admin";
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");

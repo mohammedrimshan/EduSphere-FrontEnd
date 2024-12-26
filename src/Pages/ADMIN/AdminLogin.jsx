@@ -9,7 +9,7 @@ import axios from "axios";
 import { loginAdmin } from "@/Redux/Slices/adminSlice";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/admin";
+   "http://localhost:5000/admin";
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);

@@ -29,7 +29,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import OtpModal from "@/ui/OTP";
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+   "http://localhost:5000/user";
 import axiosInterceptor from "@/axiosInstance";
 
 const validateEmail = (email) => {

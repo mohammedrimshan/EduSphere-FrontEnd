@@ -11,8 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Banner from "@/assets/Register.jpg";
 import DotDotDotSpinner from "@/ui/Spinner/DotDotDotSpinner";
 import { loginUser } from "@/Redux/Slices/userSlice";
-const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+const API_BASE_URL ="http://localhost:5000/user";
 import axiosInterceptor from "@/axiosInstance";
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);

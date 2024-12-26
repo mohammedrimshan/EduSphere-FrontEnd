@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import img from "@/assets/forget.webp";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+   "http://localhost:5000/user";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
