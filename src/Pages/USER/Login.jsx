@@ -1,4 +1,5 @@
-import React,{ useState } from "react";
+'use client'
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Eye, EyeOff, AlertTriangle } from "lucide-react";
 import LoginBanner from "@/assets/Login.svg";
