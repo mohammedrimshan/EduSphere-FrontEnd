@@ -11,7 +11,7 @@ import {
   FaExclamationCircle,
 } from "react-icons/fa";
 import { toast, Toaster } from "sonner";
-import Reset from "../../assets/Reset.jpg";
+import Reset from "@/assets/Reset.jpg";
 import axiosInterceptor from "@/axiosInstance";
 // Modal Component
 const Modal = ({ open, onClose, children }) => {

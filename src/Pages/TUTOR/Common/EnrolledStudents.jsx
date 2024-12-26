@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useTutorAuth } from "../../../Context/TutorAuthContext";
+import { useTutorAuth } from "@/../Context/TutorAuthContext";
 import axiosInterceptor from "@/axiosInstance";
 import { ChevronRight, UserCircle2 } from "lucide-react";
 

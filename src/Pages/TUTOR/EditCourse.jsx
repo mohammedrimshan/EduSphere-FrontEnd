@@ -35,8 +35,8 @@ import {
   setLoading,
   setError,
   setCourses,
-} from "../../Redux/Slices/courseSlice";
-import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+} from "@/Redux/Slices/courseSlice";
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 import axiosInterceptor from "@/axiosInstance";
 
 const CropperModal = ({ isOpen, onClose, image, onCropComplete, theme }) => {

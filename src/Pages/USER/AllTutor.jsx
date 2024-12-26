@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import Sidebar from "@/ui/sideBar";
-import LogoutModal from "../../ui/LogOutModal";
+import LogoutModal from "@/ui/LogOutModal";
 import axiosInterceptor from "@/axiosInstance";
 import {
   MdOutlineHome,

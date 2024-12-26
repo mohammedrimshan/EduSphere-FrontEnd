@@ -18,7 +18,7 @@ import {
 } from "react-icons/fi";
 import TutorHeader from "./Common/Header";
 import Footer from "../USER/Common/Footer";
-import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
 import {
   MdDashboard,
@@ -38,7 +38,7 @@ import {
   addLessonToCourse,
   updateLesson,
   deleteLesson,
-} from "../../Redux/Slices/courseSlice";
+} from "@/Redux/Slices/courseSlice";
 import DeleteConfirmationModal from "./Common/DeleteModal";
 import axiosInterceptor from "@/axiosInstance";
 

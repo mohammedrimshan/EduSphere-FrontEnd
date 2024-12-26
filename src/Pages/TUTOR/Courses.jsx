@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Edit2, Trash2, Clock, BookOpen, Users, AlertTriangle } from 'lucide-react';
 import TutorHeader from "./Common/Header";
-import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 import Footer from "../USER/Common/Footer";
 import Sidebar from "@/ui/sideBar";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
@@ -17,7 +17,7 @@ import {
 } from "react-icons/md";
 import { toast } from "sonner";
 import LogoutModal from "@/ui/LogOutModal";
-import { setCourses, deleteCourse } from "../../Redux/Slices/courseSlice";
+import { setCourses, deleteCourse } from "@/Redux/Slices/courseSlice";
 import axios from "axios";
 import axiosInterceptor from "@/axiosInstance";
 const ConfirmationModal = ({

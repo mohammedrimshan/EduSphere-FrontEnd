@@ -48,9 +48,9 @@ import {
   faMoneyBillWave,
 } from "@fortawesome/free-solid-svg-icons";
 import TutorHeader from "./Common/Header";
-import Sidebar from "../../ui/sideBar";
+import Sidebar from "@/ui/sideBar";
 import LogoutModal from "@/ui/LogOutModal";
-import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 import { toast, Toaster } from "sonner";
 import Footer from "../USER/Common/Footer";
 

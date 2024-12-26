@@ -4,12 +4,12 @@ import { toast, Toaster } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
-import OtpModal from "../../ui/OTP";
+import OtpModal from "@/ui/OTP";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Banner from "../../assets/Register.jpg";
-import DotDotDotSpinner from "../../ui/Spinner/DotDotDotSpinner";
-import { loginUser } from "../../Redux/Slices/userSlice";
+import Banner from "@/assets/Register.jpg";
+import DotDotDotSpinner from "@/ui/Spinner/DotDotDotSpinner";
+import { loginUser } from "@/Redux/Slices/userSlice";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/user";
 import axiosInterceptor from "@/axiosInstance";

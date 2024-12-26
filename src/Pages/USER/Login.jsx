@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Eye, EyeOff, AlertTriangle } from "lucide-react";
-import LoginBanner from "../../assets/Login.svg";
-import Goolge from "../../assets/Google.png";
+import LoginBanner from "@/assets/Login.svg";
+import Goolge from "@/assets/Google.png";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
-import { loginUser, setAccessToken } from "../../Redux/Slices/userSlice";
+import { loginUser, setAccessToken } from "@/Redux/Slices/userSlice";
 import { loginTutor } from "@/Redux/Slices/tutorSlice";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =

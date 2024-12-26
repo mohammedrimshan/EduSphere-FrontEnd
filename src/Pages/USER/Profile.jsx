@@ -21,9 +21,9 @@ import {
 import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
-import Sidebar from "../../ui/sideBar";
-import LogoutModal from "../../ui/LogOutModal";
-import { toggleTheme } from "../../redux/slices/themeSlice";
+import Sidebar from "@/ui/sideBar";
+import LogoutModal from "@/ui/LogOutModal";
+import { toggleTheme } from "@/redux/slices/themeSlice";
 import { updateUser, logoutUser } from "@/Redux/Slices/userSlice";
 import axios from "axios";
 import { toast } from "sonner";

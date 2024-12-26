@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { FaGraduationCap, FaPercentage } from "react-icons/fa";
 import TutorHeader from "./Common/Header";
-import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 import Footer from "../USER/Common/Footer";
 import Sidebar from "@/ui/sideBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -38,7 +38,7 @@ import {
   addCourse,
   setLoading,
   setError,
-} from "../../Redux/Slices/courseSlice";
+} from "@/Redux/Slices/courseSlice";
 import axiosInterceptor from "@/axiosInstance";
 
 const CropperModal = ({ isOpen, onClose, image, onCropComplete, theme }) => {

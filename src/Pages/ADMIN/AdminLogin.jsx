@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Eye, EyeOff, AlertTriangle } from "lucide-react";
-import AdminBanner from "../../assets/AdminLogin.jpg";
+import AdminBanner from "@/assets/AdminLogin.jpg";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
-import { loginAdmin } from "../../Redux/Slices/adminSlice";
+import { loginAdmin } from "@/Redux/Slices/adminSlice";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/admin";

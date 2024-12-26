@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaHome, FaList,FaExclamationCircle,FaUndoAlt , FaUsers, FaShoppingCart,FaFlag, FaChalkboardTeacher, FaBook, FaSignOutAlt } from 'react-icons/fa';
-import { setActiveItem, initializeFromPath, selectActiveItem } from '../../../Redux/Slices/sidebarSlice';
-import { logoutAdmin } from '../../../Redux/Slices/adminSlice';
+import { setActiveItem, initializeFromPath, selectActiveItem } from '@/../Redux/Slices/sidebarSlice';
+import { logoutAdmin } from '@/../Redux/Slices/adminSlice';
 
 const Sidebar = ({ isDarkMode,onLogout }) => {
   const navigate = useNavigate();

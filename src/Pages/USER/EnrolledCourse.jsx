@@ -7,9 +7,9 @@ import { Dialog, Transition } from "@headlessui/react";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import axiosInterceptor from "@/axiosInstance";
-import Sidebar from "../../ui/sideBar";
-import LogoutModal from "../../ui/LogOutModal";
-import { logoutUser } from "../../Redux/Slices/userSlice";
+import Sidebar from "@/ui/sideBar";
+import LogoutModal from "@/ui/LogOutModal";
+import { logoutUser } from "@/Redux/Slices/userSlice";
 import {
   MdOutlinePerson,
   MdLibraryBooks,

@@ -16,7 +16,7 @@ import {
   FaSync,
 } from "react-icons/fa";
 import Sidebar from "./Common/AdminSideBar";
-import tutorAvt from "../../assets/tutorAvt.png";
+import tutorAvt from "@/assets/tutorAvt.png";
 import { logoutAdmin } from "@/Redux/Slices/adminSlice";
 
 const Tutors = () => {

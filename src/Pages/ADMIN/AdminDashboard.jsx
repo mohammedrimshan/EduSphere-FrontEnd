@@ -27,7 +27,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { logoutAdmin } from '../../Redux/Slices/adminSlice';
+import { logoutAdmin } from '@/Redux/Slices/adminSlice';
 import Sidebar from './Common/AdminSideBar';
 import axiosInterceptor from '@/axiosInstance';
 // Register ChartJS components

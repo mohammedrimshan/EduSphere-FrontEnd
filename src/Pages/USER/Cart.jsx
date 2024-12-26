@@ -5,13 +5,13 @@ import {
   fetchCart,
   removeFromCart,
   clearCart,
-} from "../../Redux/Slices/cartSlice";
-import { useAuth } from "../../Context/AuthContext";
+} from "@/Redux/Slices/cartSlice";
+import { useAuth } from "@/Context/AuthContext";
 import Header from "./Common/Header";
-import Sidebar from "../../ui/sideBar";
-import { toggleTheme } from "../../Redux/Slices/themeSlice";
-import { logoutUser } from "../../Redux/Slices/userSlice";
-import LogoutModal from "../../ui/LogOutModal";
+import Sidebar from "@/ui/sideBar";
+import { toggleTheme } from "@/Redux/Slices/themeSlice";
+import { logoutUser } from "@/Redux/Slices/userSlice";
+import LogoutModal from "@/ui/LogOutModal";
 import { toast } from "sonner";
 import {
   MdOutlinePerson,

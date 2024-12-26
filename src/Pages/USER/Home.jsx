@@ -30,26 +30,26 @@ import {
   BsFillAwardFill,
 } from "react-icons/bs";
 
-import { logoutUser } from "../../Redux/Slices/userSlice";
-import { toggleTheme } from "../../Redux/Slices/themeSlice";
-import Banner from "../../assets/Banner.svg";
-import Graphics from "../../assets/grapics.jpg";
-import SQL from "../../assets/SQL.jpg";
-import HTML from "../../assets/HTML.png";
-import MONGO from "../../assets/MONGODB.png";
-import Button from "../../ui/Button";
-import Card from "../../ui/Card";
-import Sidebar from "../../ui/sideBar";
-import ThemeToggle from "../../ui/themeToggle";
-import LogoutModal from "../../ui/LogOutModal";
+import { logoutUser } from "@/Redux/Slices/userSlice";
+import { toggleTheme } from "@/Redux/Slices/themeSlice";
+import Banner from "@/assets/Banner.svg";
+import Graphics from "@/assets/grapics.jpg";
+import SQL from "@/assets/SQL.jpg";
+import HTML from "@/assets/HTML.png";
+import MONGO from "@/assets/MONGODB.png";
+import Button from "@/ui/Button";
+import Card from "@/ui/Card";
+import Sidebar from "@/ui/sideBar";
+import ThemeToggle from "@/ui/themeToggle";
+import LogoutModal from "@/ui/LogOutModal";
 import { toast, Toaster } from "sonner";
-import avatar from "../../assets/avt.webp";
+import avatar from "@/assets/avt.webp";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
-import { fetchCart, clearCart } from "../../Redux/Slices/cartSlice";
+import { fetchCart, clearCart } from "@/Redux/Slices/cartSlice";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import axiosInterceptor from "@/axiosInstance";
-import { setCourses } from "../../Redux/Slices/courseSlice";
+import { setCourses } from "@/Redux/Slices/courseSlice";
 export default function UserHomePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();

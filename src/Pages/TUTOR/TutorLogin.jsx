@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Eye, EyeOff, AlertTriangle } from "lucide-react";
-import TutorLoginBanner from "../../assets/TutorLogin.jpg";
-import Goolge from "../../assets/Google.png";
+import TutorLoginBanner from "@/assets/TutorLogin.jpg";
+import Goolge from "@/assets/Google.png";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
-import { loginTutor } from "../../Redux/Slices/tutorSlice";
+import { loginTutor } from "@/Redux/Slices/tutorSlice";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:5000/tutor";

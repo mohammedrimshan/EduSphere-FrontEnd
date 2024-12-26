@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Menu, Bell } from "lucide-react";
-import Button from "../../../ui/Button";
-import ThemeToggle from "../../../ui/themeToggle";
-import { toggleTheme } from "../../../Redux/Slices/themeSlice";
-import avatar from "../../../assets/avt.webp";
+import Button from "@/../ui/Button";
+import ThemeToggle from "@/../ui/themeToggle";
+import { toggleTheme } from "@/../Redux/Slices/themeSlice";
+import avatar from "@/../assets/avt.webp";
 
 export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
   const dispatch = useDispatch();

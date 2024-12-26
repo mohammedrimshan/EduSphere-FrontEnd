@@ -26,7 +26,7 @@ import Footer from "./Common/Footer";
 import {
   updateLessonProgress,
   loadUserProgress,
-} from "../../Redux/Slices/courseSlice";
+} from "@/Redux/Slices/courseSlice";
 import FloatingChatBot from "./Chat/FloatingChatBot";
 
 const EnrolledCourseLessons = () => {

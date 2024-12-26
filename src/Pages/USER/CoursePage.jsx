@@ -37,13 +37,13 @@ import { toast, Toaster } from "sonner";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import Sidebar from "@/ui/sideBar";
-import LogoutModal from "../../ui/LogOutModal";
-import { setCourses } from "../../Redux/Slices/courseSlice";
-import { setCategories } from "../../Redux/Slices/categorySlice";
-import { logoutUser } from "../../Redux/Slices/userSlice";
-import dummy1 from "../../assets/dummy1.avif";
-import dummy2 from "../../assets/dummy2.jpg";
-import dummy3 from "../../assets/dummy3.jpg";
+import LogoutModal from "@/ui/LogOutModal";
+import { setCourses } from "@/Redux/Slices/courseSlice";
+import { setCategories } from "@/Redux/Slices/categorySlice";
+import { logoutUser } from "@/Redux/Slices/userSlice";
+import dummy1 from "@/assets/dummy1.avif";
+import dummy2 from "@/assets/dummy2.jpg";
+import dummy3 from "@/assets/dummy3.jpg";
 import axiosInterceptor from "@/axiosInstance";
 
 // Helper component for star rating

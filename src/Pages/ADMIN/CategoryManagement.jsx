@@ -17,7 +17,7 @@ import {
   updateCategory,
   deleteCategory,
   setCategories,
-} from "../../Redux/Slices/categorySlice";
+} from "@/Redux/Slices/categorySlice";
 import { toast } from "sonner";
 import axios from "axios";
 import axiosInterceptor from "@/axiosInstance";

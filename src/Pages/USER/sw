@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import RegisterBanner from "../../assets/Register.jpg";
-import Google from "../../assets/Google.png";
+import RegisterBanner from "@/assets/Register.jpg";
+import Google from "@/assets/Google.png";
 import OtpModal from "./OtpModal"; // Import the OTP Modal component
 
 export default function Register() {

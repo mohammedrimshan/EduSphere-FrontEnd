@@ -14,11 +14,11 @@ import {
 import { BsPeopleFill, BsFillAwardFill } from "react-icons/bs";
 import axiosInterceptor from "@/axiosInstance";
 import { useAuth } from "@/Context/AuthContext";
-import Sidebar from "../../ui/sideBar";
+import Sidebar from "@/ui/sideBar";
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
-import LogoutModal from "../../ui/LogOutModal";
-import { logoutUser } from "../../Redux/Slices/userSlice";
+import LogoutModal from "@/ui/LogOutModal";
+import { logoutUser } from "@/Redux/Slices/userSlice";
 import { toast, Toaster } from "sonner";
 
 const PaymentStatus = () => {

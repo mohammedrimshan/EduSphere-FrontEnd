@@ -4,7 +4,7 @@ import axiosInterceptor from '@/axiosInstance';
 import { toast, Toaster } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';  // Import Eye and EyeOff icons
-import img from '../../assets/forget.webp'
+import img from '@/assets/forget.webp'
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/tutor";
 
 const TutorResetPassword = () => {

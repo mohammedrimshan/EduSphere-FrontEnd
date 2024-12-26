@@ -18,15 +18,15 @@ import {
   MdAttachMoney,
 } from "react-icons/md";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
-import { updateTutor, logoutTutor } from "../../redux/slices/tutorSlice";
-import { toggleTheme } from "../../redux/slices/themeSlice";
+import { updateTutor, logoutTutor } from "@/redux/slices/tutorSlice";
+import { toggleTheme } from "@/redux/slices/themeSlice";
 import axios from "axios";
 import axiosInterceptor from "@/axiosInstance";
 import { toast } from "sonner";
 import TutorHeader from "./Common/Header";
 import Footer from "../USER/Common/Footer";
 import Sidebar from "@/ui/sideBar";
-import LogoutModal from "../../ui/LogOutModal";
+import LogoutModal from "@/ui/LogOutModal";
 import { useNavigate } from "react-router-dom";
 import OtpModal from "@/ui/OTP";
 const API_BASE_URL =

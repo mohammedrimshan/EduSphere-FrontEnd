@@ -20,7 +20,7 @@ import {
 } from "react-icons/fa";
 import Sidebar from "@/ui/sideBar";
 import TutorHeader from "./Common/Header";
-import { logoutTutor } from "../../Redux/Slices/tutorSlice";
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
 import {
   MdDashboard,
