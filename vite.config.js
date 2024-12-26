@@ -16,8 +16,7 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    include: ['crypto-browserify'],
-    include: ['@react-oauth/google'],
+    include: ['crypto-browserify', '@react-oauth/google'],
   },
   resolve: {
     alias: {
