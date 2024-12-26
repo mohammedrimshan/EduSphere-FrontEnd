@@ -18,7 +18,7 @@ import {
   MdAttachMoney,
 } from "react-icons/md";
 import { BsCameraVideo, BsClipboardCheck } from "react-icons/bs";
-import { updateTutor, logoutTutor } from "@/redux/slices/tutorSlice";
+import { updateTutor, logoutTutor } from "@/Redux/Slices/tutorSlice";
 import { toggleTheme } from "@/Redux/Slices/themeSlice";
 import axios from "axios";
 import axiosInterceptor from "@/axiosInstance";
