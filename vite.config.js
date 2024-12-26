@@ -10,7 +10,6 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       'react': path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
-      'react-is': './node_modules/react-is/index.js',
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       buffer: 'buffer',
@@ -19,7 +18,6 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       'react-redux',
-      'react-is',
       '@reduxjs/toolkit',
       'react',
       'react-dom',
@@ -32,7 +30,6 @@ export default defineConfig({
   build: {
     target: 'es2020',
     rollupOptions: {
-      external: ['react-is'],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-redux', '@reduxjs/toolkit'],
