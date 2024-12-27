@@ -196,13 +196,12 @@ const UserChatComponent = ({ tutorId }) => {
           );
           if (!isDuplicate) {
             if (data.message.sender_id !== user.id) {
-              console.log("UserChatComponent: Marking message as read", {
-                messageId: data.message._id,
-              });
-              axiosInterceptor.post("/user/student/message/read", {
-                message_id: data.message._id,
-                chat_id: chat._id,
-              });
+              setTimeout(() => {
+                axiosInterceptor.post("/user/student/message/read", {
+                  message_id: data.message._id,
+                  chat_id: chat._id,
+                });
+              }, 0);
             }
             return [
               ...prevMessages,
@@ -302,10 +301,8 @@ const UserChatComponent = ({ tutorId }) => {
       lastSentMessageRef.current = response.data;
 
       setMessages((prevMessages) => {
-        const isDuplicate = prevMessages.some(
-          (msg) => msg._id === response.data._id
-        );
-        return isDuplicate ? prevMessages : [...prevMessages, response.data];
+        const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
+        return isDuplicate ? prevMessages : [...prevMessages, data.message];
       });
 
       setNewMessage("");
