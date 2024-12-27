@@ -22,7 +22,7 @@ export default function TutorHeader({ isOpen, setIsOpen, handleLogoutClick }) {
     }
 
     const eventSource = new EventSource(
-      `http://localhost:5000/tutor/notifications/stream`,
+      `https://edusphere-backend.rimshan.in:5000/tutor/notifications/stream`,
       {
         withCredentials: true,
       }

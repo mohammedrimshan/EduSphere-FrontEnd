@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, ChevronRight, ChevronLeft } from 'lucide-react';
 import axiosInterceptor from "@/axiosInstance";
 import { toast } from "sonner";
+import axios from 'axios';
 
 const CourseCard = ({ course }) => {
   // Calculate offer price
@@ -93,7 +94,7 @@ const CourseSections = () => {
   const fetchCourses = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosInterceptor.get('/user/courses', {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/user/coursesland`, {
         withCredentials: true
       });
       

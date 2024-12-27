@@ -163,7 +163,7 @@ const EditCoursePage = () => {
     course_thumbnail: null,
   });
 
-  const API_BASE_URL =  "http://localhost:5000";
+  const API_BASE_URL =  "https://edusphere-backend.rimshan.in:5000";
 
   useEffect(() => {
     const fetchCourseData = async () => {

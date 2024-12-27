@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
   const [lastError, setLastError] = useState(null);
   const [CallPopupOpen,setIsCallPopupOpen]=useState(false)
   useEffect(() => {
-    const socketInstance = io( 'http://localhost:5000', {
+    const socketInstance = io( 'https://edusphere-backend.rimshan.in:5000', {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,

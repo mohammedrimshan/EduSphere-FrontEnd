@@ -11,7 +11,7 @@ import TutorBanner from "@/assets/TutorBanner.jpg";
 import DotDotDotSpinner from "@/ui/Spinner/DotDotDotSpinner";
 import { loginTutor } from "@/Redux/Slices/tutorSlice";
 const API_BASE_URL =
-   "http://localhost:5000/tutor";
+   "https://edusphere-backend.rimshan.in:5000/tutor";
 import axiosInterceptor from "@/axiosInstance";
 export default function TutorRegister() {
   const [showPassword, setShowPassword] = useState(false);

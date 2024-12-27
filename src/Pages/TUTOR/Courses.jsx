@@ -284,8 +284,7 @@ const CourseManagement = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [updatingCourseId, setUpdatingCourseId] = useState(null);
   const coursesPerPage = 3;
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_BASE_URL = "https://edusphere-backend.rimshan.in:5000";
 
   const handleLogoutConfirm = () => {
     toast.success("Tutor Logout Successful");

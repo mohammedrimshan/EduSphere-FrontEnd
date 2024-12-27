@@ -32,7 +32,7 @@ const Modal = ({ open, onClose, children }) => {
 };
 
 const API_BASE_URL =
-   "http://localhost:5000/user";
+   "https://edusphere-backend.rimshan.in:5000/user";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");

@@ -61,7 +61,7 @@ const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const API_BASE_URL =
-     "http://localhost:5000/admin";
+     "https://edusphere-backend.rimshan.in:5000/admin";
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");

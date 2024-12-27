@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -17,7 +18,9 @@ import {
   MdReport 
 } from 'react-icons/md';
 import { BsCameraVideo, BsClipboardCheck } from 'react-icons/bs';
-
+import LogoutModal from "../../ui/LogOutModal";
+import {toast} from 'sonner';
+import { logoutTutor } from "@/Redux/Slices/tutorSlice";
 
 const StatCard = ({ title, value, icon: Icon, trend, percentage, theme }) => (
   <div className={`p-6 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
@@ -56,6 +59,10 @@ const RevenueDashboard = () => {
   const [loading, setLoading] = useState(true);
   const theme = useSelector((state) => state.theme.theme);
   const tutorData = useSelector((state) => state.tutor.tutorData);
+const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+ const dispatch = useDispatch();
+ const navigate = useNavigate();
 
   const menuItems = [
     { icon: MdDashboard, label: 'Dashboard', path: '/tutor/dashboard' },
@@ -66,6 +73,19 @@ const RevenueDashboard = () => {
     { icon: BsClipboardCheck, label: 'Quiz', path: '/tutor/quizmanage' },
     { icon: MdReport, label: 'Course Reports', path: '/tutor/courselist' },
   ];
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    toast.success("Tutor Logout Successful");
+
+    setTimeout(() => {
+      dispatch(logoutTutor());
+      navigate("/tutor/tutor-login");
+    }, 1000);
+  };
 
   useEffect(() => {
     const fetchRevenueData = async () => {
@@ -114,9 +134,10 @@ const RevenueDashboard = () => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         theme={theme}
+        handleLogout={handleLogoutClick}
         menuItems={menuItems}
       />
-      <TutorHeader isOpen={isOpen} setIsOpen={setIsOpen} />
+      <TutorHeader isOpen={isOpen}  handleLogoutClick={handleLogoutClick} setIsOpen={setIsOpen} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Revenue Dashboard</h1>
@@ -224,6 +245,11 @@ const RevenueDashboard = () => {
         </div>
       </div>
       <Footer />
+       <LogoutModal
+              isOpen={showLogoutModal}
+              onClose={() => setShowLogoutModal(false)}
+              onConfirm={handleLogoutConfirm}
+            />
     </div>
   );
 };

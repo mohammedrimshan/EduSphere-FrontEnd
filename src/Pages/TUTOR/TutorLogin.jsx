@@ -10,7 +10,7 @@ import axios from "axios";
 import { loginTutor } from "@/Redux/Slices/tutorSlice";
 import axiosInterceptor from "@/axiosInstance";
 const API_BASE_URL =
-   "http://localhost:5000/tutor";
+   "https://edusphere-backend.rimshan.in:5000/tutor";
 
 export default function TutorLogin() {
   const [showPassword, setShowPassword] = useState(false);

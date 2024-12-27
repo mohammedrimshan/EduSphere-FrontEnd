@@ -102,7 +102,7 @@ const CheckoutPage = () => {
       directPurchaseCourse ? item.courseId._id : item.courseId?._id
     );
     const options = {
-      key: process.env.RAZORPAY_KEY_ID,
+      key: import.meta.env.RAZORPAY_KEY_ID,
       amount: orderData.amount,
       currency: "INR",
       name: "EduSphere",

@@ -135,7 +135,7 @@ export default function Header({ isOpen, setIsOpen, handleLogoutClick }) {
     }
 
     const eventSource = new EventSource(
-      `http://localhost:5000/user/notifications/stream`,
+      `https://edusphere-backend.rimshan.in:5000/user/notifications/stream`,
       {
         withCredentials: true,
       }
