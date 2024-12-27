@@ -180,23 +180,38 @@ const UserChatComponent = ({ tutorId }) => {
 
   const handleNewMessage = useCallback(
     (data) => {
-      if (!data?.chat || !data?.message || !chat) return;
-  
-      setMessages((prevMessages) => {
-        const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
-        if (!isDuplicate) {
-          if (data.message.sender_id !== user.id) {
-            setTimeout(() => {
+      console.log("UserChatComponent: New message received", data);
+      if (data.chat && data.chat._id === chat?._id) {
+        if (
+          lastSentMessageRef.current &&
+          lastSentMessageRef.current._id === data.message._id
+        ) {
+          console.log("UserChatComponent: Duplicate message, ignoring");
+          return;
+        }
+
+        setMessages((prevMessages) => {
+          const isDuplicate = prevMessages.some(
+            (msg) => msg._id === data.message._id
+          );
+          if (!isDuplicate) {
+            if (data.message.sender_id !== user.id) {
+              console.log("UserChatComponent: Marking message as read", {
+                messageId: data.message._id,
+              });
               axiosInterceptor.post("/user/student/message/read", {
                 message_id: data.message._id,
                 chat_id: chat._id,
               });
-            }, 0);
+            }
+            return [
+              ...prevMessages,
+              { ...data.message, is_read: data.message.sender_id === user.id },
+            ];
           }
-          return [...prevMessages, data.message];
-        }
-        return prevMessages;
-      });
+          return prevMessages;
+        });
+      }
     },
     [chat, user.id]
   );
@@ -287,8 +302,10 @@ const UserChatComponent = ({ tutorId }) => {
       lastSentMessageRef.current = response.data;
 
       setMessages((prevMessages) => {
-        const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
-        return isDuplicate ? prevMessages : [...prevMessages, data.message];
+        const isDuplicate = prevMessages.some(
+          (msg) => msg._id === response.data._id
+        );
+        return isDuplicate ? prevMessages : [...prevMessages, response.data];
       });
 
       setNewMessage("");
