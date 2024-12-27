@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Banner from "@/assets/Register.jpg";
 import DotDotDotSpinner from "@/ui/Spinner/DotDotDotSpinner";
 import { loginUser } from "@/Redux/Slices/userSlice";
-const API_BASE_URL ="https://edusphere-backend.rimshan.in:5000/user";
+const API_BASE_URL ="https://edusphere-backend.rimshan.in/user";
 import axiosInterceptor from "@/axiosInstance";
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);

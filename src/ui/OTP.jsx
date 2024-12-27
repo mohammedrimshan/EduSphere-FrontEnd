@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 
-const API_BASE_URL = "https://edusphere-backend.rimshan.in:5000/user";
+const API_BASE_URL = "https://edusphere-backend.rimshan.in/user";
 
 const OtpModal = ({ isOpen, onClose, onVerify, email }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);

@@ -1,7 +1,7 @@
 // import { io } from "socket.io-client";
 // import Cookies from "js-cookie";
 // import axiosInterceptor from "@/axiosInstance";
-// const SOCKET_URL = import.meta.env.VITE_BASE_URL || "https://edusphere-backend.rimshan.in:5000";
+// const SOCKET_URL = import.meta.env.VITE_BASE_URL || "https://edusphere-backend.rimshan.in";
 
 // const getAuthDetails = () => {
 //   const tutorToken = Cookies.get("tutor_access_token");

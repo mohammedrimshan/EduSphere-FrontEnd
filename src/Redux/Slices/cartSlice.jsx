@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import axiosInterceptor from '@/axiosInstance';
-const API_BASE_URL = "https://edusphere-backend.rimshan.in:5000/user";
+const API_BASE_URL = "https://edusphere-backend.rimshan.in/user";
 export const fetchCart = createAsyncThunk(
   'cart/fetchCart',
   async (userId, { rejectWithValue }) => {

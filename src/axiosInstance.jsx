@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { logoutUser } from '@/Redux/Slices/userSlice'; // Import logout action
 
 const axiosInterceptor = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://edusphere-backend.rimshan.in:5000',
+  baseURL:  'https://edusphere-backend.rimshan.in',
   withCredentials: true,
 });
 
