@@ -180,37 +180,23 @@ const UserChatComponent = ({ tutorId }) => {
 
   const handleNewMessage = useCallback(
     (data) => {
-      console.log("UserChatComponent: New message received", data);
-      if (data.chat && data.chat._id === chat?._id) {
-        if (
-          lastSentMessageRef.current &&
-          lastSentMessageRef.current._id === data.message._id
-        ) {
-          console.log("UserChatComponent: Duplicate message, ignoring");
-          return;
-        }
-
-        setMessages((prevMessages) => {
-          const isDuplicate = prevMessages.some(
-            (msg) => msg._id === data.message._id
-          );
-          if (!isDuplicate) {
-            if (data.message.sender_id !== user.id) {
-              setTimeout(() => {
-                axiosInterceptor.post("/user/student/message/read", {
-                  message_id: data.message._id,
-                  chat_id: chat._id,
-                });
-              }, 0);
-            }
-            return [
-              ...prevMessages,
-              { ...data.message, is_read: data.message.sender_id === user.id },
-            ];
+      if (!data?.chat || !data?.message || !chat) return;
+  
+      setMessages((prevMessages) => {
+        const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
+        if (!isDuplicate) {
+          if (data.message.sender_id !== user.id) {
+            setTimeout(() => {
+              axiosInterceptor.post("/user/student/message/read", {
+                message_id: data.message._id,
+                chat_id: chat._id,
+              });
+            }, 0);
           }
-          return prevMessages;
-        });
-      }
+          return [...prevMessages, data.message];
+        }
+        return prevMessages;
+      });
     },
     [chat, user.id]
   );
