@@ -191,7 +191,7 @@ const TutorRoutes = () => {
         path="chat"
         element={
           <RequireAuth>
-            <SocketProvider url="https://edusphere-backend.rimshan.in">
+            <SocketProvider url="https://edusphere-backend.rimshan.in:5000">
               <TutorChatPage />
             </SocketProvider>
           </RequireAuth>

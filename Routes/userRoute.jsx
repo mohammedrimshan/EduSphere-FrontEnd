@@ -206,7 +206,7 @@ const UserRoutes = () => {
           path="course/:courseId/lessons"
           element={
             <RequireAuth>
-              <SocketProvider url="https://edusphere-backend.rimshan.in">
+              <SocketProvider url="https://edusphere-backend.rimshan.in:5000">
                 <EnrolledCourseLessons />
               </SocketProvider>
             </RequireAuth>
@@ -216,7 +216,7 @@ const UserRoutes = () => {
           path="chat"
           element={
             <RequireAuth>
-              <SocketProvider url="https://edusphere-backend.rimshan.in">
+              <SocketProvider url="https://edusphere-backend.rimshan.in:5000">
                 <UserChatPage />
               </SocketProvider>
             </RequireAuth>
