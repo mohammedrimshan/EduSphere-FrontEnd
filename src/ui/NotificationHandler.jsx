@@ -47,7 +47,7 @@ const NotificationHandler = () => {
       }
 
       const eventSource = new EventSource(
-        `https://edusphere-backend.rimshan.in:5000/user/notifications/stream?token=${token}`,
+        `https://edusphere-backend.rimshan.in/user/notifications/stream?token=${token}`,
         { withCredentials: true }
       );
       
