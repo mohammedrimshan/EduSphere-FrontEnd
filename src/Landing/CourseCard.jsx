@@ -94,7 +94,7 @@ const CourseSections = () => {
   const fetchCourses = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/user/coursesland`, {
+      const response = await axios.get(`https://edusphere-backend.rimshan.in/user/coursesland`, {
         withCredentials: true
       });
       
