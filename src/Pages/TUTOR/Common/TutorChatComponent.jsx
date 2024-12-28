@@ -365,7 +365,7 @@ const TutorChatComponent = ({ studentId, chatId }) => {
         fileType: file.type,
         fileSize: file.size,
       });
-
+      const loadingToast = toast.loading("Uploading file...");
       // Determine upload URL based on file type
       const uploadType = file.type.startsWith("image/")
         ? "image"
