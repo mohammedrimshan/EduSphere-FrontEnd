@@ -16,6 +16,7 @@ import Header from "@/Pages/USER/Common/Header";
 import Footer from "./Footer";
 import axiosInterceptor from "@/axiosInstance";
 import { toast } from "sonner";
+import axios from "axios";
 const ContactPage = () => {
   const theme = useSelector((state) => state.theme.theme);
   const [isOpen, setIsOpen] = useState(false);
@@ -134,7 +135,7 @@ const ContactPage = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axiosInterceptor.post("/user/contact", formData);
+      const response = await axios.post("https://edusphere-backend.rimshan.in/user/contact", formData);
 
       if (response.data.success) {
         toast.success(response.data.message);
