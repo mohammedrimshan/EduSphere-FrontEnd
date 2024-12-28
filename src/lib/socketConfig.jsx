@@ -10,8 +10,7 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState(new Map());
   const [incomingCall, setIncomingCall] = useState(null);
   const [lastError, setLastError] = useState(null);
-  const [CallPopupOpen, setIsCallPopupOpen] = useState(false);
-
+  const [CallPopupOpen,setIsCallPopupOpen]=useState(false)
   useEffect(() => {
     const socketInstance = io('https://edusphere-backend.rimshan.in', {
       transports: ['websocket', 'polling'],
@@ -22,8 +21,8 @@ export const SocketProvider = ({ children }) => {
       autoConnect: true,
     });
 
-    const handleConnect = () => {
-      console.log('Socket Connected:', socketInstance.id);
+    socketInstance.on('connect', () => {
+      console.log('Socket connected:', socketInstance.id);
       setIsConnected(true);
       if (localStorage.getItem('userId')) {
         socketInstance.emit('register-for-video', {
@@ -31,62 +30,105 @@ export const SocketProvider = ({ children }) => {
           role: localStorage.getItem('userRole') || 'student'
         });
       }
-    };
-
-    const handleIncomingCall = (data) => {
-      console.log('Socket received incoming call:', data);
-      if (data?.fromUserId && data?.signalData) {
-        setIncomingCall({
-          from: data.fromUserId,
-          signalData: data.signalData,
-          callerData: data.callerData || {}
-        });
-        setIsCallPopupOpen(true);
-      }
-    };
-
-    const handleUserStatusChange = (data) => {
-      console.log('User status change:', data);
-      setOnlineUsers(prev => {
-        const newMap = new Map(prev);
-        newMap.set(data.userId, {
-          isOnline: data.isOnline,
-          role: data.role
-        });
-        return newMap;
-      });
-    };
-
-    socketInstance.on('connect', handleConnect);
+    });
+  
     socketInstance.on('disconnect', (reason) => {
       console.log('Socket disconnected:', reason);
       setIsConnected(false);
-      setOnlineUsers(new Map());
+      if (reason === 'io server disconnect') {
+        socketInstance.connect();
+      }
     });
-    socketInstance.on('connect_error', (error) => {
-      console.error('Socket Error:', error);
-      setLastError(error.message);
-    });
+
+    const handleConnect = () => {
+      console.log('Socket Connected:', socketInstance.id);
+      setIsConnected(true);
+      // Change register to register-for-video
+      if (localStorage.getItem('userId')) {
+        socketInstance.emit('register-for-video', {
+          userId: localStorage.getItem('userId'),
+          role: localStorage.getItem('userRole') || 'student' // Add role
+        });
+      }
+    };
+  
+    // Add video registration handlers
     socketInstance.on('video-registration-success', (data) => {
       console.log('Video registration successful:', data);
+      // Store the registration state
       socketInstance.isVideoRegistered = true;
     });
+  
     socketInstance.on('video-registration-error', (error) => {
       console.error('Video registration failed:', error);
       setLastError(error.message);
     });
+
+    const handleDisconnect = (reason) => {
+      console.log('Socket Disconnected:', reason);
+      setIsConnected(false);
+      setOnlineUsers(new Map());
+    };
+
+    const handleError = (error) => {
+      console.error('Socket Error:', error);
+      setLastError(error.message);
+    };
+
+// In socketConfig.jsx
+const handleIncomingCall = (data) => {
+  console.log('Socket received incoming call:', data);
+  
+  if (data?.fromUserId && data?.signalData) {
+    setIncomingCall({
+      from: data.fromUserId,
+      signalData: data.signalData,
+      callerData: data.callerData || {} // Include caller data if available
+    });
+    setIsCallPopupOpen(true);
+  }
+};
+
+const handleUserStatusChange = (data) => {
+  console.log('User status change:', data);
+  setOnlineUsers(prev => {
+    const newMap = new Map(prev);
+    newMap.set(data.userId, { 
+      isOnline: data.isOnline, 
+      role: data.role 
+    });
+    return newMap;
+  });
+};
+
+    
+    socketInstance.on('connect', handleConnect);
+    socketInstance.on('disconnect', handleDisconnect);
+    socketInstance.on('connect_error', handleError);
     socketInstance.on('user-status-change', handleUserStatusChange);
     socketInstance.on('incomingCall', handleIncomingCall);
     socketInstance.on('callError', (error) => setLastError(error.message));
+    socketInstance.on('user-status-change', (data) => {
+      setOnlineUsers(prev => {
+        const newMap = new Map(prev);
+        newMap.set(data.userId, { 
+          isOnline: data.isOnline, 
+          socketId: data.socketId,
+          role: data.role 
+        });
+        return newMap;
+      });
+    });
 
     setSocket(socketInstance);
 
     return () => {
       socketInstance.off('connect', handleConnect);
-      socketInstance.off('disconnect');
-      socketInstance.off('connect_error');
+      socketInstance.off('disconnect', handleDisconnect);
+      socketInstance.off('connect_error', handleError);
       socketInstance.off('incomingCall', handleIncomingCall);
       socketInstance.off('callError');
+      socketInstance.off('user-status-change');
       socketInstance.off('user-status-change', handleUserStatusChange);
       socketInstance.disconnect();
     };
@@ -97,12 +139,13 @@ export const SocketProvider = ({ children }) => {
       setLastError('Socket not connected');
       return;
     }
-
+  
+    // Prevent initiating call if one is in progress
     if (incomingCall) {
       setLastError('Cannot initiate call while handling incoming call');
       return;
     }
-
+  
     const payload = {
       receiver_id: receiverId,
       signalData,
@@ -113,10 +156,10 @@ export const SocketProvider = ({ children }) => {
         avatar: callerInfo.avatar,
       }
     };
-    console.log('Initiating call with payload:', payload);
+  console.log(payload,"checking Paylosd")
     socket.emit('initiateCall', payload);
   }, [socket, incomingCall]);
-
+  
   const answerCall = useCallback((callerUserId, signalData) => {
     if (!socket?.connected) {
       setLastError('Socket not connected');
@@ -124,9 +167,10 @@ export const SocketProvider = ({ children }) => {
     }
 
     socket.emit('answerCall', {
-      toUserId: callerUserId,  // Using callerUserId as toUserId
+      toUserId: callerUserId,
       signalData,
     });
+    console.log(toUserId,"DAAAAAAAAAAAAAAAAAAAAAAAAA")
   }, [socket]);
 
   const endCall = useCallback((receiverId) => {
@@ -134,6 +178,7 @@ export const SocketProvider = ({ children }) => {
       socket.emit('endCall', { receiverId });
     }
   }, [socket]);
+
 
   const joinChatRoom = useCallback((chatId) => {
     if (socket && isConnected && chatId) {
@@ -147,12 +192,15 @@ export const SocketProvider = ({ children }) => {
     }
   }, [socket, isConnected]);
 
+
   const emitUserOnline = useCallback((userId, role) => {
     if (socket?.connected) {
       console.log('Emitting register-for-video:', { userId, role });
       socket.emit('register-for-video', { userId, role });
       localStorage.setItem('userId', userId);
       localStorage.setItem('userRole', role);
+    } else {
+      console.error('Socket not connected. Unable to emit register-for-video');
     }
   }, [socket]);
 
@@ -162,7 +210,6 @@ export const SocketProvider = ({ children }) => {
       socket.emit('leave-chat-room', chatId);
     }
   }, [socket]);
-
   const value = {
     socket,
     isConnected,
@@ -170,15 +217,13 @@ export const SocketProvider = ({ children }) => {
     incomingCall,
     lastError,
     leaveChatRoom,
-    joinChatRoom,
-    requestUserStatus,
+    joinChatRoom ,
+    requestUserStatus ,
     initiateCall,
     answerCall,
     endCall,
     emitUserOnline,
     setIncomingCall,
-    CallPopupOpen,
-    setIsCallPopupOpen
   };
 
   return (
@@ -187,3 +232,4 @@ export const SocketProvider = ({ children }) => {
     </SocketContext.Provider>
   );
 };
+
