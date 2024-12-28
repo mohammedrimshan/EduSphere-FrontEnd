@@ -21,6 +21,18 @@ export const SocketProvider = ({ children }) => {
       autoConnect: true,
     });
 
+    socketInstance.on('connect', () => {
+      console.log('Socket connected:', socketInstance.id);
+    });
+    
+    socketInstance.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+      if (reason === 'io server disconnect') {
+        // Reconnect manually if server disconnected
+        socketInstance.connect();
+      }
+    });
+
     const handleConnect = () => {
       console.log('Socket Connected:', socketInstance.id);
       setIsConnected(true);

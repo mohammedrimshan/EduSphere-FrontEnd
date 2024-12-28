@@ -93,6 +93,55 @@ const UserChatComponent = ({ tutorId }) => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (socket && chat) {
+      console.log("UserChatComponent: Joining chat room", { chatId: chat._id });
+      joinChatRoom(chat._id);
+      
+      // Log when events are received
+      socket.on("receive-message", (data) => {
+        console.log("Message received in room:", chat._id, data);
+        handleNewMessage(data);
+      });
+      
+      return () => {
+        console.log("UserChatComponent: Leaving chat room", { chatId: chat._id });
+        socket.off("receive-message");
+      };
+    }
+  }, [socket, chat, handleNewMessage]);
+
+
+  const updateMessages = (newMessage) => {
+    setMessages((prevMessages) => {
+      const messageExists = prevMessages.some(msg => msg._id === newMessage._id);
+      if (messageExists) {
+        return prevMessages;
+      }
+      return [...prevMessages, newMessage];
+    });
+  };
+
+// In UserChatComponent.jsx
+useEffect(() => {
+  if (socket) {
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
+      toast.error('Connection error. Messages may be delayed.');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+      toast.error('Unable to connect to chat server.');
+    });
+
+    return () => {
+      socket.off('error');
+      socket.off('connect_error');
+    };
+  }
+}, [socket]);
+
   const handleEmojiClick = (emojiObject) => {
     setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
     setShowEmojiPicker(false);
@@ -178,6 +227,33 @@ const UserChatComponent = ({ tutorId }) => {
     }
   };
 
+  // const handleNewMessage = useCallback((data) => {
+  //   console.log("UserChatComponent: New message received", data);
+  //   if (data.chat && data.chat._id === chat?._id) {
+  //     if (lastSentMessageRef.current && lastSentMessageRef.current._id === data.message._id) {
+  //       console.log("UserChatComponent: Duplicate message, ignoring");
+  //       return;
+  //     }
+  
+  //     setMessages((prevMessages) => {
+  //       // Check for duplicates
+  //       const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
+  //       if (!isDuplicate) {
+  //         // Mark message as read if received by user
+  //         if (data.message.sender_id !== user.id) {
+  //           console.log("UserChatComponent: Marking message as read");
+  //           axiosInterceptor.post("/user/student/message/read", {
+  //             message_id: data.message._id,
+  //             chat_id: chat._id,
+  //           });
+  //         }
+  //         return [...prevMessages, data.message];
+  //       }
+  //       return prevMessages;
+  //     });
+  //   }
+  // }, [chat, user.id]);
+
   const handleNewMessage = useCallback((data) => {
     console.log("UserChatComponent: New message received", data);
     if (data.chat && data.chat._id === chat?._id) {
@@ -190,20 +266,12 @@ const UserChatComponent = ({ tutorId }) => {
         // Check for duplicates
         const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
         if (!isDuplicate) {
-          // Mark message as read if received by user
-          if (data.message.sender_id !== user.id) {
-            console.log("UserChatComponent: Marking message as read");
-            axiosInterceptor.post("/user/student/message/read", {
-              message_id: data.message._id,
-              chat_id: chat._id,
-            });
-          }
           return [...prevMessages, data.message];
         }
         return prevMessages;
       });
     }
-  }, [chat, user.id]);
+  }, [chat]);
 
   const handleTutorTyping = useCallback(() => {
     console.log("UserChatComponent: Tutor is typing");
