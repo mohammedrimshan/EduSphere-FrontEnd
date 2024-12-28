@@ -179,6 +179,12 @@ const UserChatComponent = ({ tutorId }) => {
   const handleNewMessage = useCallback((data) => {
     console.log("UserChatComponent: New message received", data);
     if (data.chat && data.chat._id === chat?._id) {
+      // Add check for duplicate messages using lastSentMessageRef
+      if (lastSentMessageRef.current && lastSentMessageRef.current._id === data.message._id) {
+        console.log("UserChatComponent: Duplicate message, ignoring");
+        return;
+      }
+  
       setMessages((prevMessages) => {
         const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
         if (!isDuplicate) {
@@ -246,7 +252,7 @@ const UserChatComponent = ({ tutorId }) => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!chat || (!newMessage.trim() && !attachment)) return;
-
+  
     try {
       console.log("UserChatComponent: Sending message", { chatId: chat._id });
       const formData = new FormData();
@@ -264,24 +270,28 @@ const UserChatComponent = ({ tutorId }) => {
       if (attachment) {
         formData.append("file", attachment);
       }
-
+  
       const response = await axiosInterceptor.post("/user/student/message", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
+  
       console.log("UserChatComponent: Message sent successfully", response.data);
-
+      lastSentMessageRef.current = response.data; // Add this line
+  
       // Update local messages state
-      setMessages((prevMessages) => [...prevMessages, response.data]);
-
+      setMessages((prevMessages) => {
+        const isDuplicate = prevMessages.some((msg) => msg._id === response.data._id);
+        return isDuplicate ? prevMessages : [...prevMessages, response.data];
+      });
+  
       // Reset form state
       setNewMessage("");
       setAttachment(null);
       setReplyingTo(null);
       setSelectedMessage(null);
-
+  
       // Emit socket event
       if (socket && isConnected) {
         console.log("UserChatComponent: Emitting send-message event", {
@@ -532,6 +542,31 @@ const UserChatComponent = ({ tutorId }) => {
       socket.emit("student-typing", { chat_id: chat._id });
     }
   };
+
+
+// In UserChatComponent
+useEffect(() => {
+  if (socket) {
+    socket.on("connect", () => {
+      console.log("Socket connected with ID:", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("connect_error");
+    };
+  }
+}, [socket]);
+
 
   if (loading) {
     return (
