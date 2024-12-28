@@ -59,18 +59,20 @@ const UserChatComponent = ({ tutorId }) => {
       socket.on("tutor-stop-typing", () => setIsTutorTyping(false));
       socket.on("user-status-change", handleUserStatusChange);
       socket.on("self-status-change", handleSelfStatusChange);
-      socket.on("message-deleted", ({ message_id, chat_id, latest_message }) => {
-        setMessages((prevMessages) =>
-          prevMessages.filter((msg) => msg._id !== message_id)
-        );
-        if (latest_message) {
-          setChat((prevChat) => ({
-            ...prevChat,
-            last_message: latest_message,
-          }));
+      socket.on(
+        "message-deleted",
+        ({ message_id, chat_id, latest_message }) => {
+          setMessages((prevMessages) =>
+            prevMessages.filter((msg) => msg.message_id !== message_id)
+          );
+          if (latest_message) {
+            setChat((prevChat) => ({
+              ...prevChat,
+              last_message: latest_message,
+            }));
+          }
         }
-      });
-
+      );
       joinChatRoom(chat._id);
       requestUserStatus(tutorId);
       emitUserOnline(user.id, "user");
@@ -179,13 +181,13 @@ const UserChatComponent = ({ tutorId }) => {
   const handleNewMessage = useCallback((data) => {
     console.log("UserChatComponent: New message received", data);
     if (data.chat && data.chat._id === chat?._id) {
-      // Add check for duplicate messages using lastSentMessageRef
       if (lastSentMessageRef.current && lastSentMessageRef.current._id === data.message._id) {
         console.log("UserChatComponent: Duplicate message, ignoring");
         return;
       }
   
       setMessages((prevMessages) => {
+        // Check for duplicates
         const isDuplicate = prevMessages.some((msg) => msg._id === data.message._id);
         if (!isDuplicate) {
           // Mark message as read if received by user
@@ -260,7 +262,7 @@ const UserChatComponent = ({ tutorId }) => {
       formData.append("sender_id", user.id);
       formData.append("receiver_id", tutorId);
       formData.append("message", newMessage.trim());
-    
+      
       if (replyingTo) {
         formData.append("replyTo", replyingTo._id);
       }
@@ -278,7 +280,7 @@ const UserChatComponent = ({ tutorId }) => {
       });
   
       console.log("UserChatComponent: Message sent successfully", response.data);
-      lastSentMessageRef.current = response.data; // Add this line
+      lastSentMessageRef.current = response.data;
   
       // Update local messages state
       setMessages((prevMessages) => {
@@ -543,31 +545,6 @@ const UserChatComponent = ({ tutorId }) => {
     }
   };
 
-
-// In UserChatComponent
-useEffect(() => {
-  if (socket) {
-    socket.on("connect", () => {
-      console.log("Socket connected with ID:", socket.id);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-    });
-
-    socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("connect_error");
-    };
-  }
-}, [socket]);
-
-//Added
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full dark:bg-gray-800">
