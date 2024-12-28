@@ -58,7 +58,7 @@ const CoursePreview = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState(null);
-  const API_BASE_URL = "https://edusphere-backend.rimshan.in:5000";
+  const API_BASE_URL = "https://edusphere-backend.rimshan.in";
 
   useEffect(() => {
     const fetchCourseData = async () => {

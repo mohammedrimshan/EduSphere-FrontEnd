@@ -5,7 +5,7 @@ import { toast, Toaster } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';  // Import Eye and EyeOff icons
 import img from '@/assets/forget.webp'
-const API_BASE_URL =  "https://edusphere-backend.rimshan.in:5000/tutor";
+const API_BASE_URL =  "https://edusphere-backend.rimshan.in/tutor";
 
 const TutorResetPassword = () => {
     const [newPassword, setNewPassword] = useState('');
