@@ -567,7 +567,7 @@ useEffect(() => {
   }
 }, [socket]);
 
-
+//Added
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full dark:bg-gray-800">
