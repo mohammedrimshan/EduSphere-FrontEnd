@@ -1,37 +1,35 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/Context/AuthContext';
-import { useTutorAuth } from '@/Context/TutorAuthContext';
 import { useToast } from '@/Context/ToastContext';
 import { useSelector } from 'react-redux';
+import { refreshToken } from '@/lib/tokenRefresh';
 
 const NotificationHandler = () => {
   const { user } = useAuth();
-  const { tutor } = useTutorAuth();
   const { addToast } = useToast();
   const [connectionAttempts, setConnectionAttempts] = useState(0);
   const [hasShownTokenError, setHasShownTokenError] = useState(false);
   const MAX_RETRIES = 3;
   const lastNotificationRef = useRef(null);
   const eventSourceRef = useRef(null);
+  const userData = useSelector(state => state.user.userDatas);
 
   useEffect(() => {
-    // Reset connection attempts when auth changes
-    if (user || tutor) {
+    // Reset connection attempts when user changes
+    if (user) {
       setConnectionAttempts(0);
       setHasShownTokenError(false);
     }
-  }, [user, tutor]);
+  }, [user]);
 
   useEffect(() => {
-    // Early return if no authentication or if max retries exceeded
-    if ((!user && !tutor) || connectionAttempts >= MAX_RETRIES) {
+    // Early return if no user or if max retries exceeded
+    if (!user || connectionAttempts >= MAX_RETRIES) {
       return;
     }
 
     const connectSSE = () => {
-      const userToken = localStorage.getItem('accessToken');
-      const tutorToken = localStorage.getItem('tutorToken');
-      const token = userToken || tutorToken;
+      const token = user?.accessToken || localStorage.getItem('accessToken');
       
       // Only show token error once and prevent further connection attempts
       if (!token) {
@@ -48,11 +46,8 @@ const NotificationHandler = () => {
         eventSourceRef.current.close();
       }
 
-      // Determine the role for the notification endpoint
-      const role = user ? 'user' : 'tutor';
-      
       const eventSource = new EventSource(
-        `https://edusphere-backend.rimshan.in/${role}/notifications/stream?token=${token}`,
+        `https://edusphere-backend.rimshan.in/user/notifications/stream?token=${token}`,
         { withCredentials: true }
       );
       
@@ -79,43 +74,6 @@ const NotificationHandler = () => {
                 {
                   title: data.title,
                   duration: 7000
-                }
-              );
-              break;
-
-            case 'TUTOR_BOOKING':
-              // Only show for tutors
-              if (tutor) {
-                addToast(
-                  data.message,
-                  'success',
-                  {
-                    title: 'New Booking',
-                    duration: 7000
-                  }
-                );
-              }
-              break;
-
-            case 'COURSE_UPDATE':
-              // Show different messages for tutors and users
-              addToast(
-                data.message,
-                'info',
-                {
-                  title: tutor ? 'Your Course Update' : 'Course Update',
-                  duration: 5000
-                }
-              );
-              break;
-
-            case 'SESSION_REMINDER':
-              addToast(
-                data.message,
-                'info',
-                {
-                  title: tutor ? 'Upcoming Session' : 'Class Reminder',
-                  duration: 6000
                 }
               );
               break;
@@ -183,7 +141,7 @@ const NotificationHandler = () => {
         eventSourceRef.current.close();
       }
     };
-  }, [user, tutor, addToast, connectionAttempts, hasShownTokenError]);
+  }, [user, addToast, connectionAttempts, hasShownTokenError]);
 
   return null;
 };
