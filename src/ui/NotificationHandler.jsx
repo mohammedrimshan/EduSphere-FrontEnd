@@ -12,24 +12,29 @@ const NotificationHandler = () => {
   const MAX_RETRIES = 3;
   const lastNotificationRef = useRef(null);
   const eventSourceRef = useRef(null);
+  
+  // Get both user and tutor data from Redux
   const userData = useSelector(state => state.user.userDatas);
+  const tutorData = useSelector(state => state.tutor.tutorData);
 
   useEffect(() => {
-    // Reset connection attempts when user changes
-    if (user) {
+    // Reset connection attempts when authentication changes
+    if (userData || tutorData) {
       setConnectionAttempts(0);
       setHasShownTokenError(false);
     }
-  }, [user]);
+  }, [userData, tutorData]);
 
   useEffect(() => {
-    // Early return if no user or if max retries exceeded
-    if (!user || connectionAttempts >= MAX_RETRIES) {
+    // Early return if no authentication or if max retries exceeded
+    if ((!userData && !tutorData) || connectionAttempts >= MAX_RETRIES) {
       return;
     }
 
     const connectSSE = () => {
-      const token = user?.accessToken || localStorage.getItem('accessToken');
+      const userToken = userData?.accessToken || localStorage.getItem('token');
+      const tutorToken = tutorData?.accessToken || localStorage.getItem('tutorToken');
+      const token = userToken || tutorToken;
       
       // Only show token error once and prevent further connection attempts
       if (!token) {
@@ -46,8 +51,11 @@ const NotificationHandler = () => {
         eventSourceRef.current.close();
       }
 
+      // Determine the role for the notification endpoint
+      const role = userData ? 'user' : 'tutor';
+      
       const eventSource = new EventSource(
-        `https://edusphere-backend.rimshan.in/user/notifications/stream?token=${token}`,
+        `https://edusphere-backend.rimshan.in/${role}/notifications/stream?token=${token}`,
         { withCredentials: true }
       );
       
@@ -74,6 +82,28 @@ const NotificationHandler = () => {
                 {
                   title: data.title,
                   duration: 7000
+                }
+              );
+              break;
+
+            case 'TUTOR_BOOKING':
+              addToast(
+                data.message,
+                'success',
+                {
+                  title: 'New Booking',
+                  duration: 7000
+                }
+              );
+              break;
+
+            case 'COURSE_UPDATE':
+              addToast(
+                data.message,
+                'info',
+                {
+                  title: 'Course Update',
+                  duration: 5000
                 }
               );
               break;
@@ -141,7 +171,7 @@ const NotificationHandler = () => {
         eventSourceRef.current.close();
       }
     };
-  }, [user, addToast, connectionAttempts, hasShownTokenError]);
+  }, [userData, tutorData, addToast, connectionAttempts, hasShownTokenError]);
 
   return null;
 };
