@@ -169,7 +169,7 @@ const LessonManager = () => {
   const [cropperImage, setCropperImage] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
 
-  const API_BASE_URL =  "https://edusphere-backend.rimshan.in";
+  const API_BASE_URL =  "https://edusphere-backend.rimshan.in:5000";
 
   const videoRef = useRef(null);
   const thumbnailRef = useRef(null);

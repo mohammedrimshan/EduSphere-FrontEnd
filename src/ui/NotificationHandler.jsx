@@ -45,12 +45,14 @@ const NotificationHandler = () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
-
+      const role = userData?.role?.toLowerCase() || 'user';
+     console.log(role)
       const eventSource = new EventSource(
-        `https://edusphere-backend.rimshan.in/user/notifications/stream?token=${token}`,
+        `https://edusphere-backend.rimshan.in/${role}/notifications/stream?token=${token}`,
         { withCredentials: true }
       );
-      
+      console.log(`Connecting to ${eventSource}`); // Debug log
+
       eventSourceRef.current = eventSource;
 
       const handleNotification = (data) => {

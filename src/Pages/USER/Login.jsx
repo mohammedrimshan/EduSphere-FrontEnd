@@ -12,7 +12,7 @@ import axios from "axios";
 import { loginUser, setAccessToken } from "@/Redux/Slices/userSlice";
 import { loginTutor } from "@/Redux/Slices/tutorSlice";
 import axiosInterceptor from "@/axiosInstance";
-const API_BASE_URL = "https://edusphere-backend.rimshan.in/user";
+const API_BASE_URL = "https://edusphere-backend.rimshan.in:5000/user";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
