@@ -168,7 +168,7 @@ export default function Register() {
         email: formData.email,
         otp: otp,
       });
-
+  
       if (verifyResponse.data.message === "OTP verified successfully") {
         const registerResponse = await axiosInterceptor.post(`/user/signup`, {
           full_name: formData.full_name,
@@ -176,23 +176,20 @@ export default function Register() {
           phone: formData.phone,
           password: formData.password,
         });
-
+  
         if (registerResponse.data.message === "User registered successfully") {
-          // const userData = {
-          //   ...registerResponse.data.user,
-          //   phone: formData.phone,
-          // };
+          // Remove the dispatch call since we want user to login separately
           // dispatch(loginUser(userData));
-
-          // if (registerResponse.data.user) {
-          //   localStorage.setItem("token", registerResponse.data.token);
-          // }
-
-          toast.success("Registration successful!");
+  
+          // Don't store the token yet - let login handle that
+          // localStorage.setItem("token", registerResponse.data.token);
+  
+          toast.success("Registration successful! Please login to continue.");
+          
           // Clear localStorage after successful registration
           localStorage.removeItem("registerFormData");
           localStorage.removeItem("otpModalState");
-
+  
           setTimeout(() => {
             setShowOtpModal(false);
             navigate("/user/login");
@@ -204,21 +201,12 @@ export default function Register() {
         toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
-      console.error(
-        "Verification or registration error:",
-        error.response?.data
-      );
-      if (
-        error.response?.status === 400 &&
-        error.response?.data?.message === "Invalid or expired OTP"
-      ) {
+      console.error("Verification or registration error:", error.response?.data);
+      if (error.response?.status === 400 && error.response?.data?.message === "Invalid or expired OTP") {
         toast.error("OTP has expired. Please request a new one.");
         setOtp(["", "", "", "", "", ""]);
       } else {
-        toast.error(
-          error.response?.data?.message ||
-            "Verification failed. Please try again."
-        );
+        toast.error(error.response?.data?.message || "Verification failed. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
