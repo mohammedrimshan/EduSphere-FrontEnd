@@ -178,15 +178,23 @@ export default function Register() {
         });
 
         if (registerResponse.data.message === "User registered successfully") {
-          // const userData = {
-          //   ...registerResponse.data.user,
-          //   phone: formData.phone,
-          // };
-          // dispatch(loginUser(userData));
-
-          // if (registerResponse.data.user) {
-          //   localStorage.setItem("token", registerResponse.data.token);
-          // }
+          const userData = {
+            ...registerResponse.data.user,
+            accessToken: registerResponse.data.accessToken,
+            refreshToken: registerResponse.data.refreshToken
+          };
+          
+          // Store tokens
+          localStorage.setItem("token", registerResponse.data.accessToken);
+          localStorage.setItem("refreshToken", registerResponse.data.refreshToken);
+          
+          // Update Redux state
+          dispatch(loginUser(userData));
+          dispatch(setAccessToken(registerResponse.data.accessToken));
+          
+          // Set axios default header
+          axiosInterceptor.defaults.headers.common["Authorization"] = 
+            `Bearer ${registerResponse.data.accessToken}`;
 
           toast.success("Registration successful!");
           // Clear localStorage after successful registration
