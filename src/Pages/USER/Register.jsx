@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Banner from "@/assets/Register.jpg";
 import DotDotDotSpinner from "@/ui/Spinner/DotDotDotSpinner";
 import { loginUser } from "@/Redux/Slices/userSlice";
-const API_BASE_URL ="https://edusphere-backend.rimshan.in:5000/user";
+const API_BASE_URL ="https://edusphere-backend.rimshan.in/user";
 import axiosInterceptor from "@/axiosInstance";
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -178,15 +178,15 @@ export default function Register() {
         });
 
         if (registerResponse.data.message === "User registered successfully") {
-          const userData = {
-            ...registerResponse.data.user,
-            phone: formData.phone,
-          };
-          dispatch(loginUser(userData));
+          // const userData = {
+          //   ...registerResponse.data.user,
+          //   phone: formData.phone,
+          // };
+          // dispatch(loginUser(userData));
 
-          if (registerResponse.data.user) {
-            localStorage.setItem("token", registerResponse.data.token);
-          }
+          // if (registerResponse.data.user) {
+          //   localStorage.setItem("token", registerResponse.data.token);
+          // }
 
           toast.success("Registration successful!");
           // Clear localStorage after successful registration
